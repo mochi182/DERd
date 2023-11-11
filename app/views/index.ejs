@@ -1,11 +1,47 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <%- include('head'); %>
 <body>
 
     <%- include('header'); %>
 
-    <%= things.sample %>
+    <br>
+
+    <form id="uploadForm">
+        <label for="fileUpload">Upload SQL file:</label>
+        <input type="file" name="fileUpload" required>
+        <input type="submit" value="Upload">
+    </form>
+
+    <br>
+
+    <canvas width="500" height="500">
+
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+
+    <script>
+
+        let uploadForm = document.getElementById("uploadForm");
+        uploadForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            
+            var formData = new FormData(event.target);
+            console.log(formData.get("fileUpload"))
+
+            fetch("/upload", {
+                method: "POST",
+                body: formData
+            }).then((response) => {
+                console.log(response)
+            })
+        })
+
+    </script>
 
     <%- include('footer'); %>
 

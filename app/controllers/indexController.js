@@ -10,3 +10,12 @@ exports.readAll = async function (req, res) {
         res.json({"Error": err})
     }
 };
+
+exports.upload = async function (req, res) {
+    try {
+        //const things = {things: await model.readAll()};
+        console.log(req.params.fileUpload)
+    } catch(err) {
+        res.json({"Error": err})
+    }
+};

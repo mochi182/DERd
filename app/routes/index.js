@@ -3,8 +3,13 @@ const indexController = require('../controllers/indexController.js');
 
 exports.routes = function (app) {
 
-    app.use('/', (req, res) => {
+    app.get('/', (req, res) => {
         indexController.readAll(req, res)
+    });
+
+    // Create
+    app.post('/upload', (req, res) => {
+        indexController.upload(req, res);
     });
 
     // Things
