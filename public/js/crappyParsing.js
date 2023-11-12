@@ -64,10 +64,13 @@ document.querySelector("form").addEventListener("submit", (event) => {
         splitQueries = splitQueries.map((query) => query.trim() + ';')
         
         for (const query of splitQueries) {
-            console.log(query)
+            //console.log(query)
             parseSQLQuery(query)
         }
-        console.log(queryObject);
+        //console.log(queryObject);
+
+        // Call the function to draw elements
+        drawElements();
         
     } else if (selectedQueryType === "upload") {
         // If "Upload SQL file" is selected, handle the file upload
