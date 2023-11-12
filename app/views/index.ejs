@@ -2,46 +2,81 @@
 
 <html lang="en">
 <%- include('head'); %>
+
 <body>
-
+    
     <%- include('header'); %>
-
+    
     <br>
-
-    <form>
-        <label for="SQLfile">Upload SQL file:</label>
-        <input type="file" name="SQLfile" accept=".sql" required>
-        <input type="submit" value="Upload">
+    
+    <form id="queryForm">
+        <label>
+            <input type="radio" name="queryType" value="write" id="writeQuery" checked> Write query
+        </label>
+        <label>
+            <input type="radio" name="queryType" value="upload" id="uploadQuery"> Upload SQL file
+        </label>
+        
+        <div id="writeQueryDiv">
+            <textarea name="queryText" id="queryText" rows="4" cols="50" 
+            placeholder="Enter your SQL query here">select * from dual</textarea>
+        </div>
+        
+        <div id="uploadQueryDiv">
+            <label for="SQLfile">Upload SQL file:</label>
+            <input type="file" name="SQLfile" id="SQLfile" accept=".sql" required>
+        </div>
+        
+        <input type="submit" value="Submit">
     </form>
-
+    
     <br>
-
+    
     <canvas width="500" height="500">
-
-    <style>
-        canvas {
-            border: 1px solid rgb(0, 0, 0);
-        }
-    </style>
-
-    <script src="/res/js/sqlParser.js"></script>
-    <script>
-
-    var sqlParser = window.sqlParser;
-    var query = 'select * from dual';
-    var ast = sqlParser.parse(query);
-    var sql = sqlParser.stringify(ast);
-    console.log(JSON.stringify(ast, null, 2));
-
-        document.querySelector("form").addEventListener("submit", (event) => {
-            event.preventDefault();
-
-
-        })
-
-    </script>
-
-    <%- include('footer'); %>
-
-</body>
-</html>
+        
+        <style>
+            canvas {
+                border: 1px solid rgb(0, 0, 0);
+            }
+        </style>
+        
+        <script src="/res/js/sqlParser.js"></script>
+        <script>
+            
+            // Get references to form elements
+            const queryForm = document.getElementById("queryForm");
+            const writeQueryDiv = document.getElementById("writeQueryDiv");
+            const uploadQueryDiv = document.getElementById("uploadQueryDiv");
+            
+            // Event listener for radio button change
+            queryForm.addEventListener("change", function () {
+                const selectedQueryType = document.querySelector('input[name="queryType"]:checked').value;
+                if (selectedQueryType === "write") {
+                    writeQueryDiv.style.display = "block";
+                    uploadQueryDiv.style.display = "none";
+                } else if (selectedQueryType === "upload") {
+                    writeQueryDiv.style.display = "none";
+                    uploadQueryDiv.style.display = "block";
+                }
+            });
+            
+            
+            var sqlParser = window.sqlParser;
+            var query = document.querySelector("textarea").innerHTML;
+            var ast = sqlParser.parse(query);
+            var sql = sqlParser.stringify(ast);
+            console.log(JSON.stringify(ast, null, 2));
+            
+            document.querySelector("form").addEventListener("submit", (event) => {
+                event.preventDefault();
+                
+                
+            })
+            
+        </script>
+        
+        <%- include('footer'); %>
+        
+    </body>
+    
+    </html>
