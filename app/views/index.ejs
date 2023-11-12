@@ -24,7 +24,7 @@
         
         <div id="uploadQueryDiv">
             <label for="SQLfile">Upload SQL file:</label>
-            <input type="file" name="SQLfile" id="SQLfile" accept=".sql" required>
+            <input type="file" name="SQLfile" id="SQLfile" accept=".sql">
         </div>
         
         <input type="submit" value="Submit">
@@ -40,7 +40,7 @@
             }
         </style>
         
-        <script src="/res/js/sqlParser.js"></script>
+        <script src="/res/js/sqlite-parser.js"></script>
         <script>
             
             // Get references to form elements
@@ -61,18 +61,33 @@
             });
             
             
-            var sqlParser = window.sqlParser;
-            var query = document.querySelector("textarea").innerHTML;
-            var ast = sqlParser.parse(query);
-            var sql = sqlParser.stringify(ast);
-            console.log(JSON.stringify(ast, null, 2));
-            
             document.querySelector("form").addEventListener("submit", (event) => {
                 event.preventDefault();
+
+                const formData = new FormData(event.target);
+
+                console.log(formData.get("queryText"), 123, formData.get("queryFile"))
+
+                // Check which query type is selected
+                const selectedQueryType = document.querySelector('input[name="queryType"]:checked').value;
                 
-                
-            })
-            
+                if (selectedQueryType === "write") {
+                    // If "Write query" is selected, get the query from the textarea
+                    const query = document.querySelector("#queryText").value;
+                    logQuery(query);
+                } else if (selectedQueryType === "upload") {
+                    // If "Upload SQL file" is selected, handle the file upload
+                    // You can add code here to handle the file upload if needed
+                }
+            });
+
+            function logQuery(query) {
+                var sqliteParser = window.sqliteParser;
+                var ast = sqliteParser(query);
+                console.log("Parsed SQL:");
+                console.log(JSON.stringify(ast, null, 2));
+            }
+
         </script>
         
         <%- include('footer'); %>
