@@ -14,7 +14,8 @@ exports.readAll = async function (req, res) {
 exports.upload = async function (req, res) {
     try {
         //const things = {things: await model.readAll()};
-        console.log(req.params.fileUpload)
+        console.log("Test: ", Date.now())
+        console.log(req.files.SQLfile);        
     } catch(err) {
         res.json({"Error": err})
     }

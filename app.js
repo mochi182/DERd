@@ -13,6 +13,10 @@ app = express();
 const cors = require('cors');
 app.use(cors());
 
+// File upload
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
 // JSON
 app.use(express.json());
 

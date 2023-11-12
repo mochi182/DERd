@@ -8,9 +8,9 @@
 
     <br>
 
-    <form id="uploadForm">
-        <label for="fileUpload">Upload SQL file:</label>
-        <input type="file" name="fileUpload" required>
+    <form>
+        <label for="SQLfile">Upload SQL file:</label>
+        <input type="file" name="SQLfile" accept=".sql" required>
         <input type="submit" value="Upload">
     </form>
 
@@ -20,25 +20,23 @@
 
     <style>
         canvas {
-            border: 1px solid black;
+            border: 1px solid rgb(0, 0, 0);
         }
     </style>
 
+    <script src="/res/js/sqlParser.js"></script>
     <script>
 
-        let uploadForm = document.getElementById("uploadForm");
-        uploadForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            
-            var formData = new FormData(event.target);
-            console.log(formData.get("fileUpload"))
+    var sqlParser = window.sqlParser;
+    var query = 'select * from dual';
+    var ast = sqlParser.parse(query);
+    var sql = sqlParser.stringify(ast);
+    console.log(JSON.stringify(ast, null, 2));
 
-            fetch("/upload", {
-                method: "POST",
-                body: formData
-            }).then((response) => {
-                console.log(response)
-            })
+        document.querySelector("form").addEventListener("submit", (event) => {
+            event.preventDefault();
+
+
         })
 
     </script>

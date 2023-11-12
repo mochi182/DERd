@@ -7,7 +7,7 @@ exports.routes = function (app) {
         indexController.readAll(req, res)
     });
 
-    // Create
+    // Upload
     app.post('/upload', (req, res) => {
         indexController.upload(req, res);
     });
