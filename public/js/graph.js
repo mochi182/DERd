@@ -44,79 +44,82 @@ class Graph {
     getAllNodes() {
         return Array.from(this.nodes.keys());
     }
-
+    
     // Get all nodes in the graph with data
     getAllNodesWithData() {
         const allNodesWithData = diagramGraph.getAllNodes().map((node) => ({
             name: node,
             data: diagramGraph.getNodeData(node),
         }));
-
+        
         return allNodesWithData;
     }
     
-    // Calculate the repulsive force on a node
-    calculateRepulsiveForces(node) {
+    // Calculate the attractive forces on a node
+    calculateAttractiveForces(node, axis) {
+        let attractiveForces = 0;
+        for (const otherNode of this.getAllNodes()) {
+            if (node !== otherNode) {
+                const distance = this.calculateDistance(node, otherNode, axis);
+                attractiveForces += this.springConstant * Math.log(Math.abs(distance) / this.springLength);
+            }
+
+            if (!this.areNodesRelated(node, otherNode)) {
+                let repulsiveForce = calculateRepulsiveForce(node, otherNode)
+                attractiveForces -= repulsiveForce
+            }
+        }
+        return attractiveForces;
+    }
+    
+    // Calculate the repulsive forces on a node in a specific axis (X or Y)
+    calculateRepulsiveForces(node, axis) {
         let repulsiveForce = 0;
         for (const otherNode of this.getAllNodes()) {
             if (node !== otherNode) {
-                const distance = this.calculateEuclideanDistance(node, otherNode);
+                const distance = this.calculateDistance(node, otherNode, axis);
                 repulsiveForce += (-1) * this.repulsionConstant / (distance * distance);
             }
+
         }
         return repulsiveForce;
     }
-    
-    // Calculate the attractive force on a node
-    calculateAttractiveForces(node) {
-        let attractiveForce = 0;
-        for (const otherNode of this.getAllNodes()) {
-            if (node !== otherNode && this.areNodesRelated(node, otherNode)) {
-                const distance = this.calculateEuclideanDistance(node, otherNode);
-                attractiveForce += this.springConstant * Math.log(Math.abs(distance) / this.springLength);
-            }
-        }
-        return attractiveForce;
+
+    // Calculate a single repulsive force between 2 nodes on a specific axis (X or Y)
+    calculateRepulsiveForce(node, otherNode, axis) {
+        const distance = this.calculateDistance(node, otherNode, axis);
+        let repulsiveForce = (-1) * this.repulsionConstant / (distance * distance);
+        return repulsiveForce;
     }
     
-    // Calculate the total force on a node (sum of attractive and repulsive forces)
-    calculateForce(node) {
-        const repulsiveForce = this.calculateRepulsiveForces(node);
-        let attractiveForce = this.calculateAttractiveForces(node);
+    // Calculate the total force on a node (sum of attractive and repulsive forces) in a specific axis (X or Y)
+    calculateForce(node, axis) {
+        let repulsiveForces = this.calculateRepulsiveForces(node, axis);
+        let attractiveForces = this.calculateAttractiveForces(node, axis);
         
-        // Subtract the repulsive forces from nodes that are not related to the current node
-        for (const otherNode of this.getAllNodes()) {
-            if (node !== otherNode && !this.areNodesRelated(node, otherNode)) {
-                const repulsiveForceOther = this.calculateRepulsiveForces(otherNode);
-                attractiveForce -= repulsiveForceOther;
-            }
-        }
-        
-        return repulsiveForce + attractiveForce;
-    }
-    
-    // Helper method to calculate Euclidean distance between two nodes
-    calculateEuclideanDistance(node1, node2) {
-        // You can implement this function based on the positions of the nodes.
-        // For example, if nodes have { x, y } properties, you can calculate the distance.
-        const data1 = this.getNodeData(node1);
-        const data2 = this.getNodeData(node2);
-        const dx = data1.position.x - data2.position.x;
-        const dy = data1.position.y - data2.position.y;
-        return Math.sqrt(dx * dx + dy * dy);
+        return repulsiveForces + attractiveForces;
     }
     
     // Helper method to check if two nodes are related (connected in the graph)
     areNodesRelated(node1, node2) {
         return this.getNeighbors(node1).includes(node2) || this.getNeighbors(node2).includes(node1);
     }
+    
+    // Calculate the distance between two nodes in a specific axis (X or Y)
+    calculateDistanceInAxis(node1, node2, axis) {
+        const data1 = this.getNodeData(node1);
+        const data2 = this.getNodeData(node2);
+        
+        return data2.position[axis] - data1.position[axis];
+    }
+    
 }
 
 var diagramGraph = new Graph();
 
 // Get all nodes and their data
 document.querySelector("#printGraphButton").addEventListener("click", () => {
-        
+    
     // Iterate through tables and attributes
     for (const tableName in queryObject.tables) {
         // Add a node for the table
