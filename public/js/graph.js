@@ -8,7 +8,7 @@ class Graph {
     
     // Add a node to the graph
     addNode(node, data) {
-        this.nodes.set(node, { data, neighbors: [] });
+        this.nodes.set(node, { data });
     }
     
     // Add an edge between two nodes
@@ -17,8 +17,9 @@ class Graph {
             throw new Error('Both nodes must exist in the graph.');
         }
         
-        this.nodes.get(node1).neighbors.push(node2);
-        this.nodes.get(node2).neighbors.push(node1); // For an undirected graph
+        console.log(this.nodes.get(node1))
+        this.nodes.get(node1).data.neighbors.push(node2);
+        this.nodes.get(node2).data.neighbors.push(node1); // For an undirected graph
     }
     
     // Get the neighbors of a node
@@ -42,6 +43,16 @@ class Graph {
     // Get all nodes in the graph
     getAllNodes() {
         return Array.from(this.nodes.keys());
+    }
+
+    // Get all nodes in the graph with data
+    getAllNodesWithData() {
+        const allNodesWithData = diagramGraph.getAllNodes().map((node) => ({
+            name: node,
+            data: diagramGraph.getNodeData(node),
+        }));
+
+        return allNodesWithData;
     }
     
     // Calculate the repulsive force on a node
@@ -101,11 +112,11 @@ class Graph {
     }
 }
 
+var diagramGraph = new Graph();
+
 // Get all nodes and their data
 document.querySelector("#printGraphButton").addEventListener("click", () => {
-    
-    const diagramGraph = new Graph();
-    
+        
     // Iterate through tables and attributes
     for (const tableName in queryObject.tables) {
         // Add a node for the table
@@ -116,6 +127,7 @@ document.querySelector("#printGraphButton").addEventListener("click", () => {
                 x: Math.random() * 1000,
                 y: Math.random() * 1000,
             },
+            neighbors: []
         });
         
         // Add nodes for attributes
@@ -127,6 +139,7 @@ document.querySelector("#printGraphButton").addEventListener("click", () => {
                     x: Math.random() * 1000,
                     y: Math.random() * 1000,
                 },
+                neighbors: []
             });
             
             // Add an edge between the table node and attribute node
@@ -134,9 +147,6 @@ document.querySelector("#printGraphButton").addEventListener("click", () => {
         }
     }
     
-    const allNodesWithData = diagramGraph.getAllNodes().map((node) => ({
-        node,
-        data: diagramGraph.getNodeData(node),
-    }));
+    const allNodesWithData = diagramGraph.getAllNodesWithData()
     console.log('All nodes with data:', allNodesWithData);    
 });

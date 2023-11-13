@@ -70,7 +70,7 @@ document.querySelector("form").addEventListener("submit", (event) => {
         //console.log(queryObject);
 
         // Call the function to draw elements
-        drawElements();
+        //drawElements();
         
     } else if (selectedQueryType === "upload") {
         // If "Upload SQL file" is selected, handle the file upload

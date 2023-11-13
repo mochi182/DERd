@@ -4,14 +4,18 @@ const ctx = canvas.getContext("2d");
 
 // Function to draw a rectangle
 function drawRectangle(x1, y1, x2, y2, color = "black") {
+    ctx.fillStyle = 'lightGrey';
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.rect(x1, y1, x2 - x1, y2 - y1);
     ctx.stroke();
+    ctx.closePath();
+    ctx.fill();
 }
 
 // Function to draw a rhomboid (diamond shape)
 function drawRhomboid(x, y, width, height, color = "black") {
+    ctx.fillStyle = 'lightGrey';
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(x + width / 2, y);
@@ -20,14 +24,19 @@ function drawRhomboid(x, y, width, height, color = "black") {
     ctx.lineTo(x, y + height / 2);
     ctx.lineTo(x + width / 2, y);
     ctx.stroke();
+    ctx.closePath();
+    ctx.fill();
 }
 
 // Function to draw an ellipse
 function drawEllipse(x, y, width, height, color = "black") {
+    ctx.fillStyle = 'lightGrey';
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.closePath();
+    ctx.fill();
 }
 
 // Function to draw a line between two points
@@ -77,95 +86,105 @@ function clear_redraw_stack() {
 /* ----- Drawwww -----*/
 
 // Define canvas dimensions
-const canvasWidth = 550;
-const canvasHeight = 550;
+const canvasWidth = 1000;
+const canvasHeight = 1000;
 
 // Set up the canvas
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
 // Function to draw the tables as rectangles, attributes as ellipses, and relationships as rhomboids
-function drawElements() {
-    // Create an array to store the positions of elements
-    const elementPositions = [];
+function drawLines() {
+    const nodes = diagramGraph.getAllNodesWithData();
+    
+    // Loop through the nodes
+    nodes.forEach((node) => {
+        const nodeName = node.name;
+        const nodeData = node.data;
 
-    // Calculate the spacing between elements
-    const spacingX = 120; // Horizontal spacing
-    const spacingY = 60; // Vertical spacing
+        // Check if the node has any neighbors (connected nodes)
+        if (nodeData.neighbors) {
+            // Loop through the neighbors
+            nodeData.neighbors.forEach((neighbor) => {
+                // Get the position of the current node
+                const startX = nodeData.position.x;
+                const startY = nodeData.position.y;
 
-    let currentX = 30; // Initial X position
-    let currentY = 30; // Initial Y position
+                // Get the position of the neighbor node
+                const endX = diagramGraph.getNodeData(neighbor).position.x;
+                const endY = diagramGraph.getNodeData(neighbor).position.y;
 
-    // Loop through the tables in queryObject
-    for (const [tableName, _] of Object.entries(queryObject.tables)) {
-        // Draw the table as a rectangle
-        const tableWidth = 100; // Width of the table rectangle
-        const tableHeight = 50; // Height of the table rectangle
-        drawRectangle(currentX, currentY, currentX + tableWidth, currentY + tableHeight, "blue");
-
-        // Draw the table name as text within the table rectangle
-        drawLabel(currentX, currentY, currentX + tableWidth, currentY + tableHeight, tableName, "black");
-
-        // Store the position of the table
-        elementPositions[tableName] = { x: currentX, y: currentY };
-
-        // Move to the next position
-        currentY += spacingY
-        if (currentY > (canvasHeight - 100)) {
-            currentY = 30
-            currentX += spacingX
+                // Draw a line between the nodes
+                drawLine(startX, startY, endX, endY, "black");
+            });
         }
-    }
+    });
+}
 
-    // Loop through the tables and their attributes
-    for (const tableName in queryObject.tables) {
-        const table = queryObject.tables[tableName];
+function drawElements() {
+    // Clear the canvas
+    clearCanvas();
 
-        // Loop through the attributes of the table
-        for (const attributeName in table.attributes) {
+    // Draw lines between connected nodes
+    drawLines();
 
-            // Draw the attribute as an ellipse
+    // Get all nodes from the graph
+    const nodes = diagramGraph.getAllNodesWithData();
+
+    // Loop through the nodes
+    nodes.forEach((node) => {
+        const nodeName = node.name;
+        const nodeData = node.data;
+
+        // Draw nodes based on their type (Table or Attribute)
+        if (nodeName.includes("(Table)")) {
+            // Draw tables as rectangles
+            const tableWidth = 100; // Width of the table rectangle
+            const tableHeight = 50; // Height of the table rectangle
+            drawRectangle(
+                nodeData.position.x - tableWidth / 2,
+                nodeData.position.y - tableHeight / 2,
+                nodeData.position.x + tableWidth / 2,
+                nodeData.position.y + tableHeight / 2,
+                "blue"
+            );
+
+            // Draw the table name as text within the table rectangle
+            drawLabel(
+                nodeData.position.x - tableWidth / 2,
+                nodeData.position.y - tableHeight / 2,
+                nodeData.position.x + tableWidth / 2,
+                nodeData.position.y + tableHeight / 2,
+                nodeData.label,
+                "black"
+            );
+        } else if (nodeName.includes("(Attribute)")) {
+            // Draw attributes as ellipses
             const attributeWidth = 80; // Width of the ellipse
             const attributeHeight = 40; // Height of the ellipse
-            const centerX = currentX + attributeWidth / 2;
-            const centerY = currentY + attributeHeight / 2;
-            drawEllipse(currentX, currentY, attributeWidth, attributeHeight, "green");
+            drawEllipse(
+                nodeData.position.x - attributeWidth / 2,
+                nodeData.position.y - attributeHeight / 2,
+                attributeWidth,
+                attributeHeight,
+                "green"
+            );
 
             // Draw the attribute name as text within the ellipse
-            drawLabel(currentX, currentY, currentX + attributeWidth, currentY + attributeHeight, attributeName, "black");
-
-            // Store the position of the attribute
-            elementPositions[`${tableName}.${attributeName}`] = { x: centerX, y: centerY };
-
-            // Move to the next position
-            currentY += spacingY
-            if (currentY > (canvasHeight - 100)) {
-                currentY = 30
-                currentX += spacingX
-            }
+            drawLabel(
+                nodeData.position.x - attributeWidth / 2,
+                nodeData.position.y - attributeHeight / 2,
+                nodeData.position.x + attributeWidth / 2,
+                nodeData.position.y + attributeHeight / 2,
+                nodeData.label,
+                "black"
+            );
         }
-    }
-
-    // Loop through the relationships in queryObject
-    for (const relationshipName in queryObject.relationships) {
-        // Draw the relationship as a rhomboid
-        const relationshipWidth = 80; // Width of the rhomboid
-        const relationshipHeight = 80; // Height of the rhomboid
-        const centerX = currentX + relationshipWidth / 2;
-        const centerY = currentY + relationshipHeight / 2;
-        drawRhomboid(currentX, currentY, relationshipWidth, relationshipHeight, "red");
-
-        // Draw the relationship name as text within the rhomboid
-        drawLabel(currentX, currentY, currentX + relationshipWidth, currentY + relationshipHeight, relationshipName, "black");
-
-        // Store the position of the relationship
-        elementPositions[relationshipName] = { x: centerX, y: centerY };
-
-        // Move to the next position
-        currentY += spacingY + 40
-        if (currentY > (canvasHeight - 100)) {
-            currentY = 30
-            currentX += spacingX
-        }
-    }
+    });
 }
+
+
+document.getElementById("drawButton").addEventListener("click", () => {
+    drawLines()
+    drawElements();
+})
