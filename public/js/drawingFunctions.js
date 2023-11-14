@@ -183,8 +183,50 @@ function drawElements() {
     });
 }
 
+function optimizeNodePositions() {
+    let maxIterations = 5000;
+    let threshold = 0.02;
+    let count = 1;
+    let globalForce = Infinity;
+    let coolingFactor = 1;
+
+    while (count < maxIterations && globalForce > threshold) {
+        globalForce = 0;
+        let currentForces = {}
+
+        // Calculate forces and update globalForce
+        diagramGraph.getAllNodes().forEach((node) => {
+            let xForce = diagramGraph.calculateForce(node, "x");
+            let yForce = diagramGraph.calculateForce(node, "y");
+            globalForce += Math.sqrt((xForce**2) + (yForce**2));
+            currentForces[node] = {"xForce": xForce, "yForce": yForce}
+        });
+
+        // Apply forces to update node positions
+        diagramGraph.getAllNodes().forEach((node) => {
+            diagramGraph.getNodeData(node).position.x += currentForces[node].xForce * coolingFactor;
+            diagramGraph.getNodeData(node).position.y += currentForces[node].yForce * coolingFactor;
+        });
+
+        count += 1;
+        coolingFactor = 1 / Math.sqrt(count);
+        //console.log(count, globalForce)
+    }
+}
+
 
 document.getElementById("drawButton").addEventListener("click", () => {
+    console.log("Diagram drawn")
+    clearCanvas()
     drawLines()
-    drawElements();
+    drawElements()
+})
+
+document.getElementById("optimizeButton").addEventListener("click", () => {
+    console.log("Optimized forces")
+    optimizeNodePositions()
+})
+
+document.getElementById("logButton").addEventListener("click", () => {
+    console.log(diagramGraph)
 })

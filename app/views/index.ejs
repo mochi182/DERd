@@ -66,15 +66,23 @@ ADD CONSTRAINT `events_ibfk_2` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`tea
             <input type="file" name="SQLfile" id="SQLfile" accept=".sql">
         </div>
         
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" class="btn btn-success">
     </form>
 
-    <button id="printGraphButton">
+    <button id="calculateGraphButton" class="btn btn-primary">
         Calculate graph
     </button>
 
-    <button id="drawButton">
+    <button id="optimizeButton" class="btn btn-primary">
+        Optimize
+    </button>
+
+    <button id="drawButton" class="btn btn-info">
         Draw
+    </button>
+
+    <button id="logButton" class="btn btn-info">
+        Log graph
     </button>
     
     <br>
