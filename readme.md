@@ -11,7 +11,7 @@ DERbP is a web application that parses SQL queries and uses a force-directed dra
 ## Sample Image 📷
 
 <p align="center">
-  <img src="./readme_pics/sample1.jpg" alt="Sample Image">
+  <img src="./readme_pics/sample1.JPG" alt="Sample Image">
 </p>
 
 ## Features 🛠️
