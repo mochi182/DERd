@@ -3,7 +3,7 @@ class Graph {
         this.nodes = new Map();
         this.repulsionConstant = 55; //
         this.springConstant = 2;
-        this.springLength = 100;
+        this.springLength = 50;
     }
     
     // Add a node to the graph
@@ -76,7 +76,7 @@ class Graph {
                 if (this.areNodesRelated(node, otherNode)){
                     attractiveForce = -1 * direction * this.springConstant * Math.log(Math.max((distance / this.springLength), 1e-5));
                 } else {
-                    repulsiveForce = direction * 0.45 * Math.exp(-45 * distance*(0.45/1000))
+                    repulsiveForce = direction * 2 * Math.exp(-35 * distance*(0.45/1000))
                 }
             
                 //console.log(attractiveForce, repulsiveForce)

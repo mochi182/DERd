@@ -185,10 +185,10 @@ function drawElements() {
 
 function optimizeNodePositions() {
     let maxIterations = 20000;
-    let threshold = 0.0005;
+    let threshold = 0.00001;
     let count = 1;
     let globalForce = Infinity;
-    let coolingFactor = 0.99 // getCoolingFactor(maxIterations, count);
+    let coolingFactor = getCoolingFactor(maxIterations, count);
     let gravityConstant = 0.001; // A small gravitational constant
     let centerOfGravity = { x: canvasWidth/2, y: canvasHeight/2 }; // This could be the center of your graph area
 
@@ -219,7 +219,7 @@ function optimizeNodePositions() {
         });
 
         count += 1;
-        //coolingFactor = getCoolingFactor(maxIterations, count);
+        coolingFactor = getCoolingFactor(maxIterations, count);
         //coolingFactor *= coolingFactor
         //coolingFactor = 1 / Math.sqrt(count);
         console.log(count, globalForce.toFixed(5));
@@ -227,7 +227,7 @@ function optimizeNodePositions() {
 }
 
 function getCoolingFactor(maxIterations, count) {
-    const inflection = 2 // The larger, the more bent downwards
+    const inflection = 2.2 // The larger, the more bent downwards
     return Math.max(Math.exp((-inflection/maxIterations)*count), 1e-5);
 }
 
