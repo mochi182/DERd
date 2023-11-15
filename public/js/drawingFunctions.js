@@ -86,8 +86,8 @@ function clear_redraw_stack() {
 /* ----- Drawwww -----*/
 
 // Define canvas dimensions
-const canvasWidth = 1000;
-const canvasHeight = 1000;
+var canvasWidth = 1000;
+var canvasHeight = 1000;
 
 // Set up the canvas
 canvas.width = canvasWidth;
@@ -184,22 +184,32 @@ function drawElements() {
 }
 
 function optimizeNodePositions() {
-    let maxIterations = 5000;
-    let threshold = 0.02;
+    let maxIterations = 20000;
+    let threshold = 0.0005;
     let count = 1;
     let globalForce = Infinity;
-    let coolingFactor = 1;
+    let coolingFactor = 0.99 // getCoolingFactor(maxIterations, count);
+    let gravityConstant = 0.001; // A small gravitational constant
+    let centerOfGravity = { x: canvasWidth/2, y: canvasHeight/2 }; // This could be the center of your graph area
 
     while (count < maxIterations && globalForce > threshold) {
         globalForce = 0;
-        let currentForces = {}
+        let currentForces = {};
 
         // Calculate forces and update globalForce
         diagramGraph.getAllNodes().forEach((node) => {
             let xForce = diagramGraph.calculateForce(node, "x");
             let yForce = diagramGraph.calculateForce(node, "y");
+
+            // Add gravity force towards the center of gravity
+            /* let nodeData = diagramGraph.getNodeData(node);
+            let distanceToCenterX = centerOfGravity.x - nodeData.position.x;
+            let distanceToCenterY = centerOfGravity.y - nodeData.position.y;
+            xForce += gravityConstant * distanceToCenterX;
+            yForce += gravityConstant * distanceToCenterY;  */
+
             globalForce += Math.sqrt((xForce**2) + (yForce**2));
-            currentForces[node] = {"xForce": xForce, "yForce": yForce}
+            currentForces[node] = {"xForce": xForce, "yForce": yForce};
         });
 
         // Apply forces to update node positions
@@ -209,11 +219,17 @@ function optimizeNodePositions() {
         });
 
         count += 1;
-        coolingFactor = 1 / Math.sqrt(count);
-        //console.log(count, globalForce)
+        //coolingFactor = getCoolingFactor(maxIterations, count);
+        //coolingFactor *= coolingFactor
+        //coolingFactor = 1 / Math.sqrt(count);
+        console.log(count, globalForce.toFixed(5));
     }
 }
 
+function getCoolingFactor(maxIterations, count) {
+    const inflection = 2 // The larger, the more bent downwards
+    return Math.max(Math.exp((-inflection/maxIterations)*count), 1e-5);
+}
 
 document.getElementById("drawButton").addEventListener("click", () => {
     console.log("Diagram drawn")
@@ -230,3 +246,40 @@ document.getElementById("optimizeButton").addEventListener("click", () => {
 document.getElementById("logButton").addEventListener("click", () => {
     console.log(diagramGraph)
 })
+
+document.getElementById("centerButton").addEventListener("click", () => {
+    console.log("Diagram centered and redrawn")
+    centerGraph()
+    clearCanvas()
+    drawLines()
+    drawElements()
+})
+
+function centerGraph() {
+    // Calculate the current centroid among all points
+    let centerX = 0;
+    let centerY = 0;
+    const nodes = diagramGraph.getAllNodesWithData();
+
+    for (const node of nodes) {
+        const position = node.data.position;
+        centerX += position.x;
+        centerY += position.y;
+    }
+
+    if (nodes.length > 0) {
+        centerX /= nodes.length;
+        centerY /= nodes.length;
+    }
+
+    // Calculate the displacement to the current center of the canvas
+    const displacementX = canvasWidth / 2 - centerX;
+    const displacementY = canvasHeight / 2 - centerY;
+
+    // Add the displacement to every point in the graph
+    for (const node of nodes) {
+        const nodeName = node.name
+        diagramGraph.getNodeData(nodeName).position.x += displacementX;
+        diagramGraph.getNodeData(nodeName).position.y += displacementY;
+    }
+}

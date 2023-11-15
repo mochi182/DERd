@@ -1,9 +1,9 @@
 class Graph {
     constructor() {
         this.nodes = new Map();
-        this.repulsionConstant = 15;
-        this.springConstant = 1;
-        this.springLength = 50;
+        this.repulsionConstant = 55; //
+        this.springConstant = 2;
+        this.springLength = 100;
     }
     
     // Add a node to the graph
@@ -46,68 +46,54 @@ class Graph {
     
     // Get all nodes in the graph with data
     getAllNodesWithData() {
-        const allNodesWithData = diagramGraph.getAllNodes().map((node) => ({
+        const allNodesWithData = this.getAllNodes().map((node) => ({
             name: node,
-            data: diagramGraph.getNodeData(node),
+            data: this.getNodeData(node),
         }));
         
         return allNodesWithData;
     }
     
-// Calculate the attractive forces on a node
-calculateAttractiveForces(node, axis) {
-    let attractiveForces = 0;
-    for (const otherNode of this.getAllNodes()) {
-        if (node !== otherNode && this.areNodesRelated(node, otherNode)) {
-            const distance = this.calculateDistance(node, otherNode, axis);
-            const direction = -1 * distance/Math.abs(distance)
-            
-            const force = direction * this.springConstant * Math.log(Math.max((Math.abs(distance) / this.springLength), 1e-5));
-            attractiveForces += force;
-        }
-
-        //if (!this.areNodesRelated(node, otherNode)) {
-        //    const repulsiveForce = this.calculateRepulsiveForce(node, otherNode, axis);
-        //    attractiveForces += repulsiveForce;
-        //}
-    }
-
-    //console.log(attractiveForces)
-
-    return attractiveForces;
-}
-    
-    // Calculate the repulsive forces on a node in a specific axis (X or Y)
-    calculateRepulsiveForces(node, axis) {
-        let repulsiveForces = 0;
-        for (const otherNode of this.getAllNodes()) {
-            if (node !== otherNode && !this.areNodesRelated(node, otherNode)) {
-                const distance = this.calculateDistance(node, otherNode, axis);
-                const direction = 1 * distance/Math.abs(distance)
-
-                const force = direction * this.repulsionConstant / Math.max((distance**2), 1e-5);
-                repulsiveForces += force;
-            }
-
-        }
-        return repulsiveForces;
-    }
-
-    // Calculate a single repulsive force between 2 nodes on a specific axis (X or Y)
-    calculateRepulsiveForce(node, otherNode, axis) {
-        const distance = this.calculateDistance(node, otherNode, axis);
-        const direction = 1 * distance/Math.abs(distance)
-        const force = direction * this.repulsionConstant / Math.max(distance**2, 1e-5);
-        return force;
-    }
-    
-    // Calculate the total force on a node (sum of attractive and repulsive forces) in a specific axis (X or Y)
+    // Calculate the attractive forces on a node
     calculateForce(node, axis) {
-        let repulsiveForces = this.calculateRepulsiveForces(node, axis);
-        let attractiveForces = this.calculateAttractiveForces(node, axis);
-        
-        //console.log(attractiveForces, repulsiveForces)
-        return attractiveForces + 1.2 * repulsiveForces;
+        let totalForces = 0;
+        for (const otherNode of this.getAllNodes()) {
+            if (node !== otherNode) {
+                const displacement = this.calculateDisplacement(node, otherNode, axis);
+                const distance = Math.abs(displacement)
+                let randomSign = Math.random() < 0.5 ? -1 : 1;
+                const direction =  distance > 1e-5 ? displacement/distance : randomSign;
+
+                //let attractiveForce = -1 * direction * (distance/this.springLength**2);
+                //let repulsiveForce = direction * this.springLength**2 / Math.max(distance, 1e-5)
+                let repulsiveForce = 0
+
+                //let repulsiveForce = direction * 7 * Math.max(0, Math.log(Math.max((this.repulsionConstant / distance), 1e-5)))
+
+                let attractiveForce = 0
+                //let repulsiveForce = direction * this.repulsionConstant / Math.max(distance**2, 1e-5)
+
+                if (this.areNodesRelated(node, otherNode)){
+                    attractiveForce = -1 * direction * this.springConstant * Math.log(Math.max((distance / this.springLength), 1e-5));
+                } else {
+                    repulsiveForce = direction * 0.45 * Math.exp(-45 * distance*(0.45/1000))
+                }
+            
+                //console.log(attractiveForce, repulsiveForce)
+                totalForces += attractiveForce + repulsiveForce;
+            }
+        }
+        return totalForces;
+    }
+
+    rangeCutoff(bottom, top, num) {
+        if (num < bottom) {
+            return bottom
+        } else if (num > top) {
+            return top
+        } else {
+            return num
+        }
     }
     
     // Helper method to check if two nodes are related (connected in the graph)
@@ -115,13 +101,41 @@ calculateAttractiveForces(node, axis) {
         return this.getNeighbors(node1).includes(node2) || this.getNeighbors(node2).includes(node1);
     }
     
-    // Calculate the distance between two nodes in a specific axis (X or Y)
-    calculateDistance(node1, node2, axis) {
+    // Calculate the displacement between two nodes in a specific axis (X or Y)
+    calculateDisplacement(node1, node2, axis) {
         const data1 = this.getNodeData(node1);
         const data2 = this.getNodeData(node2);
         
         return data1.position[axis] - data2.position[axis];
     }
+
+    connectAttributesInCircle() {
+        // Get all nodes from the graph
+        const nodes = this.getAllNodesWithData();
+    
+        // Iterate through the nodes
+        for (const node of nodes) {
+            const nodeName = node.name
+
+            // Check if the node is a table (you can define a condition here based on your data)
+            if (nodeName.includes("(Table)")) {
+
+                const neighbors = this.getNeighbors(nodeName);
+    
+                if (neighbors.length > 1) {
+                    // Connect the neighbors in a circular manner
+                    for (let i = 0; i < neighbors.length; i++) {
+                        const sourceNode = neighbors[i];
+                        const targetNode = neighbors[(i + 1) % neighbors.length];
+    
+                        // Add an edge between sourceNode and targetNode
+                        this.addEdge(sourceNode, targetNode);
+                    }
+                }
+            }
+        }
+    }
+    
     
 }
 
@@ -137,8 +151,8 @@ document.querySelector("#calculateGraphButton").addEventListener("click", () => 
         diagramGraph.addNode(tableNode, {
             label: tableName,
             position: {
-                x: Math.random() * 900,
-                y: Math.random() * 900,
+                x: Math.random() * (900 - 100) + 100,
+                y: Math.random() * (900 - 100) + 100,
             },
             neighbors: []
         });
@@ -149,8 +163,8 @@ document.querySelector("#calculateGraphButton").addEventListener("click", () => 
             diagramGraph.addNode(attributeNode, {
                 label: attributeName,
                 position: {
-                    x: Math.random() * 900,
-                    y: Math.random() * 900,
+                    x: Math.random() * (900 - 100) + 100,
+                    y: Math.random() * (900 - 100) + 100,
                 },
                 neighbors: []
             });
@@ -162,5 +176,8 @@ document.querySelector("#calculateGraphButton").addEventListener("click", () => 
     
     const allNodesWithData = diagramGraph.getAllNodesWithData()
     console.log("Calculated graph")
-    //console.log('All nodes with data:', allNodesWithData);    
+    //console.log('All nodes with data:', allNodesWithData);   
+    
+    // Test: Connecting all attributes circularly
+    //diagramGraph.connectAttributesInCircle()
 });
