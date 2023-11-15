@@ -1,9 +1,10 @@
 class Graph {
     constructor() {
         this.nodes = new Map();
-        this.repulsionConstant = 55; //
-        this.springConstant = 2;
-        this.springLength = 50;
+        this.repulsionConstant = 200; //
+        this.springConstant = 30;
+        this.springLength = 75;
+        this.repulsionLength = 50;
     }
     
     // Add a node to the graph
@@ -66,18 +67,20 @@ class Graph {
 
                 //let attractiveForce = -1 * direction * (distance/this.springLength**2);
                 //let repulsiveForce = direction * this.springLength**2 / Math.max(distance, 1e-5)
-                let repulsiveForce = 0
-
                 //let repulsiveForce = direction * 7 * Math.max(0, Math.log(Math.max((this.repulsionConstant / distance), 1e-5)))
-
-                let attractiveForce = 0
                 //let repulsiveForce = direction * this.repulsionConstant / Math.max(distance**2, 1e-5)
+                //let repulsiveForce = (this.repulsionConstant / Math.max(distance**2, 1e-5)) * direction * 75 * Math.exp(-2*distance/this.repulsionLength);
+
+                // direction * 10 * Math.exp(50/(distance+20))
+                // (this.repulsionConstant / Math.max(distance**0.5, 1e-5)) * 0.08
+
+                //let repulsiveForce = direction * 10 * Math.exp(50/(distance+20)) //* 0.1
+                let repulsiveForce = direction * (100 / Math.max((distance+70)**0.9, 1e-5)) ** 5.5
+                let attractiveForce = 0
 
                 if (this.areNodesRelated(node, otherNode)){
-                    attractiveForce = -1 * direction * this.springConstant * Math.log(Math.max((distance / this.springLength), 1e-5));
-                } else {
-                    repulsiveForce = direction * 2 * Math.exp(-35 * distance*(0.45/1000))
-                }
+                    attractiveForce = -1 * direction * 20 * Math.log(Math.max((distance / 100), 1e-5));
+                } 
             
                 //console.log(attractiveForce, repulsiveForce)
                 totalForces += attractiveForce + repulsiveForce;
@@ -159,7 +162,7 @@ document.querySelector("#calculateGraphButton").addEventListener("click", () => 
         
         // Add nodes for attributes
         for (const attributeName in queryObject.tables[tableName].attributes) {
-            const attributeNode = `${attributeName} (Attribute)`;
+            const attributeNode = `${attributeName} (Attribute of ${tableName})`;
             diagramGraph.addNode(attributeNode, {
                 label: attributeName,
                 position: {
@@ -172,6 +175,16 @@ document.querySelector("#calculateGraphButton").addEventListener("click", () => 
             // Add an edge between the table node and attribute node
             diagramGraph.addEdge(tableNode, attributeNode);
         }
+    }
+    
+    // Iterate through relationships and add edges between related entities
+    for (const relationshipName in queryObject.relationships) {
+        const relationship = queryObject.relationships[relationshipName];
+        const tableNode = `${relationship.table} (Table)`;
+        const referencedTableNode = `${relationship.referencedTable} (Table)`;
+        
+        // Add edges between related entities
+        diagramGraph.addEdge(tableNode, referencedTableNode, { label: relationshipName });
     }
     
     const allNodesWithData = diagramGraph.getAllNodesWithData()

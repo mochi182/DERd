@@ -35,24 +35,22 @@ document.querySelector("form").addEventListener("submit", (event) => {
         .map((query) => 
         query.replaceAll('\n', ' ')
         .replaceAll('`', '')
-        .replace(/\s+/g, ' ')
+        .replaceAll(/\s+/g, ' ')
         .replaceAll(' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci', '')
+        .trim()
+        + ';'
         );
         
         let splitQueries = [];
         
         for (const query of queries) {
-            if (query.includes("ALTER TABLE") && query.includes("PRIMARY KEY")) {
+            if (query.includes("ALTER") && query.includes("PRIMARY")) {
                 splitQueries.push(query.split(', ADD KEY')[0])
-            } else if (query.includes("ALTER TABLE") && query.includes("FOREIGN KEY")) {
+            } else if (query.includes("ALTER") && query.includes("FOREIGN")) {
                 if (query.includes("CONSTRAINT")) {
                     const toRemoveRegex = /(CONSTRAINT [^`||^ ]+)/g;
-                    const modifiedQuery = query.replaceAll(toRemoveRegex, '')
-                    .replaceAll(',', '')
-                    .split('ADD')
-                    .slice(1, length-1)
-                    .map((query) => 'ALTER TABLE events ADD ' + query.trim());
-                    splitQueries.push(...modifiedQuery);
+                    const modifiedQuery = query.replaceAll(toRemoveRegex, '').replaceAll(/\s+/g, ' ')
+                    splitQueries.push(modifiedQuery);
                 } else {
                     splitQueries.push(query);
                 }
@@ -60,17 +58,11 @@ document.querySelector("form").addEventListener("submit", (event) => {
                 splitQueries.push(query);
             }
         }
-        
-        splitQueries = splitQueries.map((query) => query.trim() + ';')
-        
+                
         for (const query of splitQueries) {
-            //console.log(query)
             parseSQLQuery(query)
         }
-        //console.log(queryObject);
-
-        // Call the function to draw elements
-        //drawElements();
+        console.log("Final: ", queryObject);
         
     } else if (selectedQueryType === "upload") {
         // If "Upload SQL file" is selected, handle the file upload

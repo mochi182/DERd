@@ -158,7 +158,7 @@ function drawElements() {
                 nodeData.label,
                 "black"
             );
-        } else if (nodeName.includes("(Attribute)")) {
+        } else if (nodeName.includes("Attribute of")) {
             // Draw attributes as ellipses
             const attributeWidth = 80; // Width of the ellipse
             const attributeHeight = 40; // Height of the ellipse
@@ -184,7 +184,7 @@ function drawElements() {
 }
 
 function optimizeNodePositions() {
-    let maxIterations = 20000;
+    let maxIterations = 10000;
     let threshold = 0.00001;
     let count = 1;
     let globalForce = Infinity;
@@ -223,6 +223,7 @@ function optimizeNodePositions() {
         //coolingFactor *= coolingFactor
         //coolingFactor = 1 / Math.sqrt(count);
         console.log(count, globalForce.toFixed(5));
+
     }
 }
 
