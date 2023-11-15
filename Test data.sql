@@ -50,9 +50,8 @@ CREATE TABLE `players` (
   `team` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ALTER TABLE `players`
-  ADD PRIMARY KEY (`player_id`),
-  ADD KEY `team` (`team`);
-  CREATE TABLE `events` (
+  ADD PRIMARY KEY (`player_id`);
+CREATE TABLE `events` (
     `event_id` int(11) NOT NULL,
     `event_date` date NOT NULL,
     `event_time` time NOT NULL,
@@ -63,11 +62,10 @@ ALTER TABLE `players`
     `teamB_score` int(11) DEFAULT NULL,
     `field_id` varchar(50) NOT NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-  ALTER TABLE `events`
+ALTER TABLE `events`
   ADD PRIMARY KEY (`event_id`),
   ADD KEY `teamA_id` (`teamA_id`),
   ADD KEY `teamB_id` (`teamB_id`),
   ADD KEY `field_id` (`field_id`);
-ALTER TABLE `events`
-ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`),
-ADD CONSTRAINT `events_ibfk_2` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`);
+ALTER TABLE `events` ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`);
+ALTER TABLE `events` ADD CONSTRAINT `events_ibfk_2` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`);

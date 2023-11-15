@@ -139,6 +139,18 @@ class Graph {
         }
     }
     
+    repositionRelationship(node) {
+        let relData = this.getNodeData(node)
+        let middleX = 0
+        let middleY = 0
+        relData.neighbors.forEach((neighbor) => {
+            const neighborData = this.getNodeData(neighbor);
+            middleX += neighborData.position.x
+            middleY += neighborData.position.y
+        })
+        relData.position.x = middleX/relData.neighbors.length
+        relData.position.y = middleY/relData.neighbors.length
+    }
     
 }
 
@@ -146,7 +158,10 @@ var diagramGraph = new Graph();
 
 // Get all nodes and their data
 document.querySelector("#calculateGraphButton").addEventListener("click", () => {
-    
+    calculateGraph()
+});
+
+function calculateGraph() {
     // Iterate through tables and attributes
     for (const tableName in queryObject.tables) {
         // Add a node for the table
@@ -183,14 +198,31 @@ document.querySelector("#calculateGraphButton").addEventListener("click", () => 
         const tableNode = `${relationship.table} (Table)`;
         const referencedTableNode = `${relationship.referencedTable} (Table)`;
         
+        // Calculate the middle position between the related tables
+        const tablePosition = diagramGraph.getNodeData(tableNode).position;
+        const referencedTablePosition = diagramGraph.getNodeData(referencedTableNode).position;
+        const middleX = (tablePosition.x + referencedTablePosition.x) / 2;
+        const middleY = (tablePosition.y + referencedTablePosition.y) / 2;
+        
+        // Add a node for the relationship
+        const relationshipNode = `${relationshipName} (Relationship)`;
+        diagramGraph.addNode(relationshipNode, {
+            label: relationshipName,
+            position: {
+                x: middleX,
+                y: middleY,
+            },
+            neighbors: []
+        });
+        
         // Add edges between related entities
-        diagramGraph.addEdge(tableNode, referencedTableNode, { label: relationshipName });
+        diagramGraph.addEdge(tableNode, relationshipNode, { label: relationshipName });
+        diagramGraph.addEdge(referencedTableNode, relationshipNode, { label: relationshipName });
     }
     
-    const allNodesWithData = diagramGraph.getAllNodesWithData()
-    console.log("Calculated graph")
-    //console.log('All nodes with data:', allNodesWithData);   
-    
-    // Test: Connecting all attributes circularly
-    //diagramGraph.connectAttributesInCircle()
-});
+    console.log("Calculated graph");
+}
+
+function obtainMiddle(n1, n2) {
+    return (n1 + n2) / 2
+}

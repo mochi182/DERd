@@ -136,7 +136,7 @@ function drawElements() {
         const nodeName = node.name;
         const nodeData = node.data;
 
-        // Draw nodes based on their type (Table or Attribute)
+        // Draw nodes based on their type (Table, Attribute, or Relationship)
         if (nodeName.includes("(Table)")) {
             // Draw tables as rectangles
             const tableWidth = 100; // Width of the table rectangle
@@ -179,6 +179,27 @@ function drawElements() {
                 nodeData.label,
                 "black"
             );
+        } else if (nodeName.includes("(Relationship)")) {
+            // Draw relationship nodes as rhomboids
+            const relationshipWidth = 80; // Width of the rhomboid
+            const relationshipHeight = 80; // Height of the rhomboid
+            drawRhomboid(
+                nodeData.position.x - relationshipWidth / 2,
+                nodeData.position.y - relationshipHeight / 2,
+                relationshipWidth,
+                relationshipHeight,
+                "red"
+            );
+
+            // Draw the relationship name as text within the rhomboid
+            drawLabel(
+                nodeData.position.x - relationshipWidth / 2,
+                nodeData.position.y - relationshipHeight / 2,
+                nodeData.position.x + relationshipWidth / 2,
+                nodeData.position.y + relationshipHeight / 2,
+                nodeData.label,
+                "black"
+            );
         }
     });
 }
@@ -189,7 +210,7 @@ function optimizeNodePositions() {
     let count = 1;
     let globalForce = Infinity;
     let coolingFactor = getCoolingFactor(maxIterations, count);
-    let gravityConstant = 0.001; // A small gravitational constant
+    let gravityConstant = 0.01; // A small gravitational constant
     let centerOfGravity = { x: canvasWidth/2, y: canvasHeight/2 }; // This could be the center of your graph area
 
     while (count < maxIterations && globalForce > threshold) {
@@ -202,11 +223,11 @@ function optimizeNodePositions() {
             let yForce = diagramGraph.calculateForce(node, "y");
 
             // Add gravity force towards the center of gravity
-            /* let nodeData = diagramGraph.getNodeData(node);
+             let nodeData = diagramGraph.getNodeData(node);
             let distanceToCenterX = centerOfGravity.x - nodeData.position.x;
             let distanceToCenterY = centerOfGravity.y - nodeData.position.y;
             xForce += gravityConstant * distanceToCenterX;
-            yForce += gravityConstant * distanceToCenterY;  */
+            yForce += gravityConstant * distanceToCenterY;  
 
             globalForce += Math.sqrt((xForce**2) + (yForce**2));
             currentForces[node] = {"xForce": xForce, "yForce": yForce};
@@ -214,15 +235,18 @@ function optimizeNodePositions() {
 
         // Apply forces to update node positions
         diagramGraph.getAllNodes().forEach((node) => {
-            diagramGraph.getNodeData(node).position.x += currentForces[node].xForce * coolingFactor;
-            diagramGraph.getNodeData(node).position.y += currentForces[node].yForce * coolingFactor;
+            if (!node.includes("(Relationship)")) {
+                diagramGraph.getNodeData(node).position.x += currentForces[node].xForce * coolingFactor;
+                diagramGraph.getNodeData(node).position.y += currentForces[node].yForce * coolingFactor;
+            } else {
+                diagramGraph.repositionRelationship(node)
+            }
         });
 
         count += 1;
         coolingFactor = getCoolingFactor(maxIterations, count);
-        //coolingFactor *= coolingFactor
         //coolingFactor = 1 / Math.sqrt(count);
-        console.log(count, globalForce.toFixed(5));
+        //console.log(count, globalForce.toFixed(5));
 
     }
 }
