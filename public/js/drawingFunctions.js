@@ -48,14 +48,26 @@ function drawLine(x1, y1, x2, y2, color = "black") {
     ctx.stroke();
 }
 
-// Function to draw text within a shape
-function drawLabel(x1, y1, x2, y2, label = "", color = "grey") {
+// Function to draw text within a shape with an optional underline
+function drawLabel(x1, y1, x2, y2, label = "", color = "grey", underline = false) {
     ctx.fillStyle = color;
     ctx.textAlign = "center";
     const xc = x1 + Math.round((x2 - x1) / 2);
     const yc = y1 + Math.round((y2 - y1) / 2);
     ctx.font = "12px Arial";
     ctx.fillText(label, xc, yc);
+
+    if (underline) {
+        const textWidth = ctx.measureText(label).width;
+        const lineHeight = 2; 
+        const lineY = yc + 3; 
+        ctx.beginPath();
+        ctx.moveTo(xc - textWidth / 2, lineY);
+        ctx.lineTo(xc + textWidth / 2, lineY);
+        ctx.lineWidth = lineHeight;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+    }
 }
 
 // Function to clear the canvas
@@ -177,7 +189,8 @@ function drawElements() {
                 nodeData.position.x + attributeWidth / 2,
                 nodeData.position.y + attributeHeight / 2,
                 nodeData.label,
-                "black"
+                "black",
+                nodeData.isPK
             );
         } else if (nodeName.includes("(Relationship)")) {
             // Draw relationship nodes as rhomboids

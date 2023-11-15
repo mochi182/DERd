@@ -172,7 +172,8 @@ function calculateGraph() {
                 x: Math.random() * (900 - 100) + 100,
                 y: Math.random() * (900 - 100) + 100,
             },
-            neighbors: []
+            neighbors: [],
+            isPK: false
         });
         
         // Add nodes for attributes
@@ -184,7 +185,8 @@ function calculateGraph() {
                     x: Math.random() * (900 - 100) + 100,
                     y: Math.random() * (900 - 100) + 100,
                 },
-                neighbors: []
+                neighbors: [],
+                isPK: queryObject.tables[tableName].PK.includes(attributeName) ? true : false
             });
             
             // Add an edge between the table node and attribute node
@@ -212,7 +214,8 @@ function calculateGraph() {
                 x: middleX,
                 y: middleY,
             },
-            neighbors: []
+            neighbors: [],
+            isPK: false
         });
         
         // Add edges between related entities
