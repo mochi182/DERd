@@ -218,7 +218,7 @@ function drawElements() {
 }
 
 function optimizeNodePositions() {
-    let maxIterations = 10000;
+    let maxIterations = 30000;
     let threshold = 0.00001;
     let count = 1;
     let globalForce = Infinity;
@@ -262,10 +262,11 @@ function optimizeNodePositions() {
         //console.log(count, globalForce.toFixed(5));
 
     }
+    console.log(count, globalForce.toFixed(5))
 }
 
 function getCoolingFactor(maxIterations, count) {
-    const inflection = 2.2 // The larger, the more bent downwards
+    const inflection = 2 // The larger, the more bent downwards
     return Math.max(Math.exp((-inflection/maxIterations)*count), 1e-5);
 }
 

@@ -3,7 +3,7 @@ class Graph {
         this.nodes = new Map();
         this.repulsionConstant = 200; //
         this.springConstant = 30;
-        this.springLength = 75;
+        this.springLength = 100;
         this.repulsionLength = 50;
     }
     
@@ -75,12 +75,20 @@ class Graph {
                 // (this.repulsionConstant / Math.max(distance**0.5, 1e-5)) * 0.08
 
                 //let repulsiveForce = direction * 10 * Math.exp(50/(distance+20)) //* 0.1
-                let repulsiveForce = direction * (100 / Math.max((distance+70)**0.9, 1e-5)) ** 5.5
+                //let repulsiveForce = direction * (100 / Math.max((distance+70)**0.9, 1e-5)) ** 5.5 // OK
+                
+                let repulsiveForce = 0
                 let attractiveForce = 0
 
                 if (this.areNodesRelated(node, otherNode)){
-                    attractiveForce = -1 * direction * 20 * Math.log(Math.max((distance / 100), 1e-5));
-                } 
+                    // attractiveForce = -1 * direction * 20 * Math.log(Math.max((distance / 100), 1e-5)); // OK
+                    attractiveForce = -1 * direction * (((distance + 1000)**2)/this.springLength)**0.5
+                    repulsiveForce = direction * ((this.springLength**2)/(distance + 50))**1.12
+                }  else {
+                    if (distance < this.springLength) {
+                        repulsiveForce = direction * ((this.springLength**1.6485)/(distance + 10))+18
+                    }
+                }
             
                 //console.log(attractiveForce, repulsiveForce)
                 totalForces += attractiveForce + repulsiveForce;
@@ -224,6 +232,7 @@ function calculateGraph() {
     }
     
     console.log("Calculated graph");
+    diagramGraph.connectAttributesInCircle()
 }
 
 function obtainMiddle(n1, n2) {
