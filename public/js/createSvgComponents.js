@@ -1,6 +1,6 @@
 /* ----- SVG image ----- */
 
-function createSvgRectangleWithLabel(centerX, centerY, width = 90, height= 40, label) {
+function createSvgRectangle(centerX, centerY, width = 90, height= 40, label) {
     const x = centerX - (width/2)
     const y = centerY - (height/2)
     
@@ -43,7 +43,7 @@ function createSvgRectangleWithLabel(centerX, centerY, width = 90, height= 40, l
     return rect + labelSvg;
 }
 
-function createSvgEllipseWithLabel(centerX, centerY, rx = 38, ry = 25, label, isPK = false) {
+function createSvgEllipse(centerX, centerY, rx = 38, ry = 25, label, isPK = false) {
     const ellipseSvg = `
         <ellipse 
             cx="${centerX}" cy="${centerY}" 
@@ -83,7 +83,7 @@ function createSvgEllipseWithLabel(centerX, centerY, rx = 38, ry = 25, label, is
     return ellipseSvg + labelSvg;
 }
 
-function createSvgRhomboidWithLabel(centerX, centerY, width = 70, height = 70, label) {
+function createSvgRhombus(centerX, centerY, width = 70, height = 70, label) {
     const halfWidth = width / 2;
     const halfHeight = height / 2;
 
@@ -96,7 +96,7 @@ function createSvgRhomboidWithLabel(centerX, centerY, width = 70, height = 70, l
 
     const pathData = `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]} L ${points[2][0]} ${points[2][1]} L ${points[3][0]} ${points[3][1]} Z`;
 
-    const rhomboidSvg = `
+    const RhombusSvg = `
         <path 
             d="${pathData}" 
             fill="#e1d5e7" 
@@ -108,7 +108,7 @@ function createSvgRhomboidWithLabel(centerX, centerY, width = 70, height = 70, l
     const labelX = centerX;
     const labelY = centerY + 4; // Adjust for vertical alignment
     const paddingTop = centerY;
-    const marginLeft = centerX - halfWidth + 1; // Adjust based on rhomboid's width
+    const marginLeft = centerX - halfWidth + 1; // Adjust based on Rhombus's width
 
     const labelSvg = `
         <g transform="translate(-0.5 -0.5)">
@@ -132,10 +132,10 @@ function createSvgRhomboidWithLabel(centerX, centerY, width = 70, height = 70, l
             </switch>
         </g>`;
 
-    return rhomboidSvg + labelSvg;
+    return RhombusSvg + labelSvg;
 }
 
-function createSvgLineWithLabel(startX, startY, endX, endY, label = "") {
+function createSvgLine(startX, startY, endX, endY, label = "") {
     const pathData = `M ${startX} ${startY} L ${endX} ${endY}`;
 
     const lineSvg = `
@@ -200,26 +200,93 @@ function svgTemplate(content, xmlContent = ""){
     </svg>`
 }
 
-/* ----- XML tempalte ---- */
+/* ----- XML template ---- */
 
-function createDrawioXmlTemplate(diagramName, content, diagramId) {
+function createXmlRectangle(centerX, centerY, width = 90, height = 40, label, uniqueId) {
+    const x = centerX - (width / 2);
+    const y = centerY - (height / 2);
+
+    const xmlRectangle = `
+        <mxCell id="${uniqueId}" value="${label}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+            <mxGeometry x="${x}" y="${y}" width="${width}" height="${height}" as="geometry" />
+        </mxCell>`;
+
+    return xmlRectangle;
+}
+
+function createXmlEllipse(centerX, centerY, rx = 38, ry = 25, label, isPK = false, uniqueId) {
+    // Calculate the actual position and size based on the radius
+    const x = centerX - rx;
+    const y = centerY - ry;
+    const width = rx * 2;
+    const height = ry * 2;
+
+    // Escape the label if it needs to be underlined (isPK)
+    const escapedLabel = isPK ? `&lt;u&gt;${label}&lt;/u&gt;` : label;
+
+    // Generate the XML string
+    const xmlEllipse = `
+        <mxCell id="${uniqueId}" value="${escapedLabel}" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+            <mxGeometry x="${x}" y="${y}" width="${width}" height="${height}" as="geometry" />
+        </mxCell>`;
+
+    return xmlEllipse;
+}
+
+function createXmlRhombus(centerX, centerY, width = 70, height = 70, label, uniqueId) {
+    const x = centerX - (width / 2);
+    const y = centerY - (height / 2);
+
+    return `
+        <mxCell id="${uniqueId}" value="${label}" style="rhombus;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+            <mxGeometry x="${x}" y="${y}" width="${width}" height="${height}" as="geometry" />
+        </mxCell>`;
+}
+
+function createXmlLine(startX, startY, endX, endY, label = "", sourceId, targetId, uniqueId1) {
+    const uniqueId2 = generateId(); // For the label
+
+    // Edge XML
+    const lineXml = `
+        <mxCell id="${uniqueId1}" style="edgeStyle=rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="${sourceId}" target="${targetId}">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>`;
+
+    // Label XML
+    const labelXml = label != "" ? `
+        <mxCell id="${uniqueId2}" value="${label}" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="${uniqueId1}">
+          <mxGeometry x="-0.4" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>` : "";
+
+    return lineXml + labelXml;
+}
+
+function createDrawioXmlTemplate(content) {
+    // Generate unique strings from diagram name and id
+    const diagramId = generateId()
+    const diagramName = generateId()
+
     // Current timestamp for the modified attribute
     const currentTimestamp = new Date().toISOString();
 
     // Escaping the diagram name for XML
-    const escapedDiagramName = escapeForXML(diagramName)
+    //const escapedDiagramName = escapeForXML(diagramName)
 
     // Base structure of the draw.io XML
     const xmlTemplate = `
-<mxfile host="app.diagrams.net" modified="${currentTimestamp}" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" version="22.1.3" type="device">
-  <diagram name="${escapedDiagramName}" id="${diagramId}">
-    <mxGraphModel dx="538" dy="478" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
-      <root>
-        ${content}
-      </root>
-    </mxGraphModel>
-  </diagram>
-</mxfile>`;
+        <mxfile host="app.diagrams.net" modified="${currentTimestamp}" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" version="22.1.3" type="device">
+        <diagram name="${diagramName}" id="${diagramId}">
+            <mxGraphModel dx="538" dy="478" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
+                ${content}
+            </root>
+            </mxGraphModel>
+        </diagram>
+        </mxfile>`;
 
     return xmlTemplate;
 }
@@ -229,7 +296,10 @@ function escapeForXML(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+    .replace(/'/g, '&apos;')
+    .replace(/[\t\n\r]/gm,'')
+    .replaceAll(/\s+/g, ' ')
+    .trim()
 }
 
 /* ----- Redraw the elements in the redraw stack ----- */
@@ -241,19 +311,24 @@ var drawingWidth = 1000
 var drawingHeight = 1000
 
 function redraw() {
-    let content = '';
+    let svgContent = ''
+    let xmlContent = ''
 
     // Iterate through the redrawStack and concatenate SVG components
-    for (const key in redrawStack) {
-        if (redrawStack.hasOwnProperty(key)) {
-            content += redrawStack[key];
+    for (const id in redrawStack) {
+        if (redrawStack.hasOwnProperty(id)) {
+            parameters = redrawStack[id].params
+            svgContent += redrawStack[id].Svg(...parameters)
+            xmlContent += redrawStack[id].Xml(...parameters, id)
         }
     }
 
-    // Wrap content with SVG template
-    const svgImage = svgTemplate(content);
+    drawioXMLCode = createDrawioXmlTemplate(xmlContent)
 
-    //console.log(svgImage)
+    // Wrap content with SVG template
+    const svgImage = svgTemplate(svgContent, escapeForXML(drawioXMLCode));
+
+    console.log(svgImage)
 
     // Encode SVG image to base64
     const encodedSvg = btoa(unescape(encodeURIComponent(svgImage)));

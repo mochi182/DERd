@@ -160,6 +160,7 @@ function calculateGraph() {
         // Add a node for the table
         const tableNode = `${tableName} (Table)`;
         diagramGraph.addNode(tableNode, {
+            id: generateId(),
             label: tableName,
             position: {
                 x: Math.random() * (900 - 100) + 100,
@@ -173,6 +174,7 @@ function calculateGraph() {
         for (const attributeName in queryObject.tables[tableName].attributes) {
             const attributeNode = `${attributeName} (Attribute of ${tableName})`;
             diagramGraph.addNode(attributeNode, {
+                id: generateId(),
                 label: attributeName,
                 position: {
                     x: Math.random() * (900 - 100) + 100,
@@ -202,6 +204,7 @@ function calculateGraph() {
         // Add a node for the relationship
         const relationshipNode = `${relationshipName} (Relationship)`;
         diagramGraph.addNode(relationshipNode, {
+            id: generateId(),
             label: relationshipName,
             position: {
                 x: middleX,

@@ -22,7 +22,7 @@ document.getElementById("drawButton").addEventListener("click", () => {
     centerGraph()
     addLinesToDrawStack()
     addNodesToDrawStack()
-    console.log(redrawStack)
+    //console.log(redrawStack)
     redraw()
     console.log("Diagram drawn")
 })

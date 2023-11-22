@@ -12,7 +12,7 @@ var canvasHeight = 1000;
 canvas.width = canvasWidth;
 canvas.height = canvasHeight; */
 
-// Function to draw the tables as rectangles, attributes as ellipses, and relationships as rhomboids
+// Function to draw the tables as rectangles, attributes as ellipses, and relationships as Rhombuss
 function addLinesToDrawStack() {
     const nodes = diagramGraph.getAllNodesWithData();
     
@@ -26,18 +26,24 @@ function addLinesToDrawStack() {
             // Loop through the neighbors
             nodeData.neighbors.forEach((neighbor) => {
 
-                const lineName = `[${nodeName}]-[${neighbor}] line`
+                // Generate a unique id that will be used when drawing the Xml
+                const lineId = generateId() // `${nodeData.label}-${neighbor.label}-line`
 
                 // Get the position of the current node
                 const startX = nodeData.position.x;
                 const startY = nodeData.position.y;
 
                 // Get the position of the neighbor node
-                const endX = diagramGraph.getNodeData(neighbor).position.x;
-                const endY = diagramGraph.getNodeData(neighbor).position.y;
+                const neighborData = diagramGraph.getNodeData(neighbor)
+                const endX = neighborData.position.x;
+                const endY = neighborData.position.y;
 
                 // Add line draw to stack
-                redrawStack[lineName] = createSvgLineWithLabel(startX, startY, endX, endY)
+                redrawStack[lineId] = {
+                    Svg: createSvgLine,
+                    Xml: createXmlLine,
+                    params: [startX, startY, endX, endY, "", nodeData.id, neighborData.id]
+                }
             });
         }
     });
@@ -56,32 +62,44 @@ function addNodesToDrawStack() {
         // Draw nodes based on their type (Table, Attribute, or Relationship)
         if (nodeName.includes("(Table)")) {
             // Add rectangle component to stack
-            redrawStack[nodeName] = createSvgRectangleWithLabel(
-                nodeData.position.x,
-                nodeData.position.y,
-                90,
-                40,
-                nodeData.label
-            )
+            redrawStack[nodeData.id] = {
+                Svg: createSvgRectangle,
+                Xml: createXmlRectangle,
+                params: [
+                    nodeData.position.x,
+                    nodeData.position.y,
+                    90,
+                    40,
+                    nodeData.label
+                ]
+            }
         } else if (nodeName.includes("Attribute of")) {
             // Add ellipse draw to stack
-            redrawStack[nodeName] = createSvgEllipseWithLabel(
-                nodeData.position.x,
-                nodeData.position.y,
-                38,
-                25,
-                nodeData.label,
-                nodeData.isPK
-            )
+            redrawStack[nodeData.id] = {
+                Svg: createSvgEllipse,
+                Xml: createXmlEllipse,
+                params: [
+                    nodeData.position.x,
+                    nodeData.position.y,
+                    38,
+                    25,
+                    nodeData.label,
+                    nodeData.isPK
+                ]
+            }
         } else if (nodeName.includes("(Relationship)")) {
-            // Add rhomboid to draw stack
-            redrawStack[nodeName] = createSvgRhomboidWithLabel(
-                nodeData.position.x,
-                nodeData.position.y,
-                70,
-                70,
-                nodeData.label
-            )
+            // Add Rhombus to draw stack
+            redrawStack[nodeData.id] = {
+                Svg: createSvgRhombus,
+                Xml: createXmlRhombus,
+                params: [
+                    nodeData.position.x,
+                    nodeData.position.y,
+                    70,
+                    70,
+                    nodeData.label
+                ]
+            }
         }
     });
 }
