@@ -96,16 +96,6 @@ class Graph {
         }
         return totalForces;
     }
-
-    rangeCutoff(bottom, top, num) {
-        if (num < bottom) {
-            return bottom
-        } else if (num > top) {
-            return top
-        } else {
-            return num
-        }
-    }
     
     // Helper method to check if two nodes are related (connected in the graph)
     areNodesRelated(node1, node2) {
@@ -163,11 +153,6 @@ class Graph {
 }
 
 var diagramGraph = new Graph();
-
-// Get all nodes and their data
-document.querySelector("#calculateGraphButton").addEventListener("click", () => {
-    calculateGraph()
-});
 
 function calculateGraph() {
     // Iterate through tables and attributes
@@ -231,10 +216,38 @@ function calculateGraph() {
         diagramGraph.addEdge(referencedTableNode, relationshipNode, { label: relationshipName });
     }
     
-    console.log("Calculated graph");
     diagramGraph.connectAttributesInCircle()
 }
 
 function obtainMiddle(n1, n2) {
     return (n1 + n2) / 2
+}
+
+function centerGraph() {
+    // Calculate the current centroid among all points
+    let centerX = 0;
+    let centerY = 0;
+    const nodes = diagramGraph.getAllNodesWithData();
+
+    for (const node of nodes) {
+        const position = node.data.position;
+        centerX += position.x;
+        centerY += position.y;
+    }
+
+    if (nodes.length > 0) {
+        centerX /= nodes.length;
+        centerY /= nodes.length;
+    }
+
+    // Calculate the displacement to the current center
+    const displacementX = 1000 / 2 - centerX;
+    const displacementY = 1000 / 2 - centerY;
+
+    // Add the displacement to every point in the graph
+    for (const node of nodes) {
+        const nodeName = node.name
+        diagramGraph.getNodeData(nodeName).position.x += displacementX;
+        diagramGraph.getNodeData(nodeName).position.y += displacementY;
+    }
 }
