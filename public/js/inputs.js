@@ -13,8 +13,8 @@ document.getElementById("logButton").addEventListener("click", () => {
 
 // Optimize forces button
 document.getElementById("optimizeButton").addEventListener("click", () => {
-    console.log("Optimized forces")
     optimizeNodePositions()
+    console.log("Optimized forces")
 })
 
 // Draw button
@@ -22,6 +22,7 @@ document.getElementById("drawButton").addEventListener("click", () => {
     centerGraph()
     addLinesToDrawStack()
     addNodesToDrawStack()
+    console.log(redrawStack)
     redraw()
     console.log("Diagram drawn")
 })
