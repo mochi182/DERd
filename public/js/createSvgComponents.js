@@ -328,7 +328,7 @@ function redraw() {
     // Wrap content with SVG template
     const svgImage = svgTemplate(svgContent, escapeForXML(drawioXMLCode));
 
-    console.log(svgImage)
+    //console.log(svgImage)
 
     // Encode SVG image to base64
     const encodedSvg = btoa(unescape(encodeURIComponent(svgImage)));
