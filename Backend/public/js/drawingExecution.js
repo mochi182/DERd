@@ -105,7 +105,7 @@ function addNodesToDrawStack() {
 }
 
 function optimizeNodePositions() {
-    let maxIterations = 100;
+    let maxIterations = 10000;
     let threshold = 0.00001;
     let count = 1;
     let globalForce = Infinity;
