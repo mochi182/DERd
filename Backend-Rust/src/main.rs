@@ -1,14 +1,9 @@
-use axum::{routing::get, Router};
+use Backend-Rust::run;
 
 #[tokio::main]
 
 async fn main() {
-    let app: Router = Router::new().route("/", get(hello_world));
-
-    axum::Server::bind(&"0.0.0.0:3050".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap()
+    run().await
 }
 
 
