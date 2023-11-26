@@ -1,3 +1,3 @@
 pub async fn hello_world() -> String {
-    "Hello world from my own gtghtfile.".to_owned()
+    "Hello world.".to_owned()
 }
