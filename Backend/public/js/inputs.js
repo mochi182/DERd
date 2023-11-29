@@ -9,6 +9,7 @@ document.getElementById("calculateGraphButton").addEventListener("click", () => 
 // Log graph button
 document.getElementById("logButton").addEventListener("click", () => {
     console.log(diagramGraph)
+    console.log(JSON.stringify(diagramGraph.nodes))
 })
 
 // Optimize forces button
