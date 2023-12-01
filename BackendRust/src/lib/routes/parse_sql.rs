@@ -60,42 +60,53 @@ fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
 }
 
-use sqlparser::ast::{SetExpr, ObjectName, Ident, TableFactor , Table, TableWithJoins, Select, Query, Statement, WildcardAdditionalOptions};
+use sqlparser::ast::{TableConstraint, SetExpr, ObjectName, Ident, TableFactor , Table, TableWithJoins, Select, Query, Statement, WildcardAdditionalOptions};
 use sqlparser::ast::FunctionArgExpr::Wildcard;
 use sqlparser::ast::GroupByExpr::Expressions;
 use std::option::Option;
 
-pub fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
+fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
     let mut database_object = DatabaseObject {
         tables: HashMap::new(),
         relationships: HashMap::new(),
     };
 
     for statement in ast {
-        if let Statement::Query(boxed_query) = statement {
-            if let Query { body: boxed_select, .. } = *boxed_query {
-                // Process the Query here
-                if let SetExpr::Select(thing) = *boxed_select {
-                    // Process the Query here
-                    if let Select {from: from, ..} = *thing {
+        if let Statement::CreateTable { name, columns, constraints, .. } = statement {
+            let mut attributes = Vec::new();
+            let mut pk = Vec::new();
+            let mut is_joint = false;
 
-                        if let Option::Some(caraeverga) = from.first() {
-                            //println!("{:?}", caraeverga);
-                            if let TableWithJoins {relation: xuxa, ..} = caraeverga {
-                                //println!("{:?}", xuxa);
-                                if let TableFactor::Table {name: name, ..} = xuxa {
+            for column in columns {
+                let attribute_name = column.name;
+                let attribute_type = column.data_type;
 
-                                    println!("Table name: {}", xuxa);
+                attributes.push(format!("{}: {}", attribute_name, attribute_type));
+            }
 
-                                }
-                            }
+            for constraint in constraints {
+                if let TableConstraint::Unique { is_primary, columns, .. } = constraint {
+                    if is_primary {
+                        for column in columns {
+                            pk.push(column.to_string());
                         }
                     }
                 }
             }
+
+            if pk.len() > 1 {
+                is_joint = true;
+            }
+
+            let entity = Entity {
+                attributes,
+                pk,
+                is_joint,
+            };
+
+            database_object.tables.insert(name.to_string(), entity);
         }
     }
-    
 
     database_object
 }
