@@ -3,6 +3,7 @@ use axum::extract::Json;
 use serde_json::{json, Value};
 use sqlparser::dialect::MySqlDialect;
 use sqlparser::parser::Parser;
+use sqlparser::ast::{TableConstraint, AlterTableOperation, Statement};
 
 use std::collections::HashMap;
 
@@ -59,8 +60,6 @@ pub async fn parse_sql(body: String) -> Json<ParsedSqlResponse> {
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
 }
-
-use sqlparser::ast::{TableConstraint, AlterTableOperation, SetExpr, ObjectName, Ident, TableFactor , Table, TableWithJoins, Select, Query, Statement, WildcardAdditionalOptions};
 
 fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
     let mut database_object = DatabaseObject {

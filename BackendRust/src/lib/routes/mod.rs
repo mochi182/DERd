@@ -1,23 +1,27 @@
-mod hello_world;
-mod mirror_body_string;
-mod mirror_body_json;
+mod index;
 mod parse_sql;
 
-use hello_world::hello_world;
-use mirror_body_string::mirror_body_string;
-use mirror_body_json::mirror_body_json;
+use index::index;
 use parse_sql::parse_sql;
 use axum::{
-    body::Body,
+    http::Method,
     routing::{get, post},
     Router}
     ;
 
+use tower_http::cors::{Any, CorsLayer};
+
 pub async fn create_routes() -> Router {
+
+    // Add CORS middleware
+    let cors = CorsLayer::new()
+    .allow_methods([Method::GET, Method::POST])
+    .allow_origin(Any);
+
     let app = Router::new()
-    .route("/", get(hello_world))
-    .route("/mirror_body_string", post(mirror_body_string))
-    .route("/mirror_body_json", post(mirror_body_json))
-    .route("/parse_sql", post(parse_sql));
+    .route("/", get(index))
+    .route("/parse_sql", post(parse_sql))
+    .layer(cors);
+
     return app;
 }
