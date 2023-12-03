@@ -1,22 +1,26 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
-  import Diagram from './lib/Diagram.svelte'
-  import Input from './lib/Input.svelte'
-  import RenderButton from './lib/RenderButton.svelte'
-</script>
-
-<main>
-
-    <Input />
-
-    <RenderButton />
-
-    <Diagram />
-
-</main>
-
-<style>
-
-</style>
+    import UploaderComponent from "./components/UploaderComponent.svelte";
+    import ImageComponent from "./components/ImageComponent.svelte";
+    import { createGraph } from "./utils/graph";
+  
+    let globalState = {
+      uploadedData: null,
+      graph: null,
+    };
+  
+    $: if ($globalState.uploadedData) {
+      $globalState.graph = createGraph($globalState.uploadedData.object);
+    }
+  </script>
+  
+  <div>
+    <UploaderComponent {globalState} />
+    {#if $globalState.graph}
+      <ImageComponent {graph: $globalState.graph} />
+    {/if}
+  </div>
+  
+  <style>
+    /* Add your styles here */
+  </style>
+  
