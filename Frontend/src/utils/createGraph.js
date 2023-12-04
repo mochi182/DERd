@@ -1,3 +1,5 @@
+import { generateId } from "./helperFunctions"
+
 export function createGraph($globalState) {
 
     console.log($globalState)
@@ -37,11 +39,11 @@ export function createGraph($globalState) {
         });
     }
     
-/*     // Iterate through relationships and add edges between related entities
+    // Iterate through relationships and add edges between related entities
     for (const relationshipName in $globalState.uploadedData.relationships) {
         const relationship = $globalState.uploadedData.relationships[relationshipName];
         const tableNode = `${relationship.table} (Table)`;
-        const referencedTableNode = `${relationship.referencedTable} (Table)`;
+        const referencedTableNode = `${relationship.referenced_table} (Table)`;
         
         // Calculate the middle position between the related tables
         const tablePosition = $globalState.graph.getNodeData(tableNode).position;
@@ -65,13 +67,7 @@ export function createGraph($globalState) {
         // Add edges between related entities
         $globalState.graph.addEdge(tableNode, relationshipNode, { label: relationshipName });
         $globalState.graph.addEdge(referencedTableNode, relationshipNode, { label: relationshipName });
-    } */
+    }
     
-    //$globalState.graph.connectAttributesInCircle()
-}
-
-
-function generateId() {
-    const uid = Date.now().toString(36) + Math.floor(Math.pow(10, 12) + Math.random() * 9*Math.pow(10, 12)).toString(36)
-    return uid
+    $globalState.graph.connectAttributesInCircle()
 }

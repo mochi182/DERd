@@ -150,5 +150,34 @@ export class Graph {
         relData.position.x = middleX/relData.neighbors.length
         relData.position.y = middleY/relData.neighbors.length
     }
+
+    centerGraph() {
+        // Calculate the current centroid among all points
+        let centerX = 0;
+        let centerY = 0;
+        const nodes = this.getAllNodesWithData();
+    
+        for (const node of nodes) {
+            const position = node.data.position;
+            centerX += position.x;
+            centerY += position.y;
+        }
+    
+        if (nodes.length > 0) {
+            centerX /= nodes.length;
+            centerY /= nodes.length;
+        }
+    
+        // Calculate the displacement to the current center
+        const displacementX = 1000 / 2 - centerX;
+        const displacementY = 1000 / 2 - centerY;
+    
+        // Add the displacement to every point in the graph
+        for (const node of nodes) {
+            const nodeName = node.name
+            this.getNodeData(nodeName).position.x += displacementX;
+            this.getNodeData(nodeName).position.y += displacementY;
+        }
+    }
     
 }

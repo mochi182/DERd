@@ -1,17 +1,18 @@
 <script>
     import { onMount } from "svelte";
-    import { globalState } from '../stores.js'
-    
-    let svgContent = "";
-  
-    onMount(() => {
-      svgContent = `<svg></svg>`;
-    });
-  </script>
-  
-  <div>
-    {#if svgContent}
-      {@html svgContent}
-    {/if}
-  </div>
-  
+    import { globalState } from "../stores.js";
+
+    export let imageSrc;
+</script>
+
+<div>
+    <img id="ErDiagram" title="Click to edit image" alt="ER diagram" src={imageSrc} />
+</div>
+
+<style>
+    #ErDiagram {
+        cursor: pointer;
+        border: 1px solid black;
+    }
+
+</style>

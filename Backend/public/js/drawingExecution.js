@@ -1,17 +1,5 @@
 /* ----- Drawwww -----*/
 
-// Initialize your canvas and context
-/* const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
-
-// Define canvas dimensions
-var canvasWidth = 1000;
-var canvasHeight = 1000;
-
-// Set up the canvas
-canvas.width = canvasWidth;
-canvas.height = canvasHeight; */
-
 // Function to draw the tables as rectangles, attributes as ellipses, and relationships as Rhombuss
 function addLinesToDrawStack() {
     const nodes = diagramGraph.getAllNodesWithData();
