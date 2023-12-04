@@ -3,12 +3,12 @@ use axum::extract::Json;
 use serde_json::{json, Value};
 use sqlparser::dialect::MySqlDialect;
 use sqlparser::parser::Parser;
-use sqlparser::ast::{TableConstraint, AlterTableOperation, Statement};
+use sqlparser::ast::{Ident, TableConstraint, AlterTableOperation, Statement};
 
 use std::collections::HashMap;
 
 #[derive(Serialize)]
-struct Entity {
+struct Table {
     attributes: Vec<String>,
     pk: Vec<String>,
     is_joint: bool,
@@ -25,7 +25,7 @@ struct Relationship {
 
 #[derive(Serialize)]
 pub struct DatabaseObject {
-    tables: HashMap<String, Entity>,
+    tables: HashMap<String, Table>,
     relationships: HashMap<String, Relationship>,
 }
 
@@ -73,12 +73,20 @@ fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
                 let mut attributes = Vec::new();
                 let mut pk = Vec::new();
                 let mut is_joint = false;
+
+                // Obtain table name without quotes or ticks
+                let table_name = match name.0.first() {
+                    Some(ident) => ident.value.clone(),
+                    None => {
+                        panic!("Table name not specified in the SQL statement");
+                    }
+                };
     
                 for column in columns {
-                    let attribute_name = column.name;
-                    let attribute_type = column.data_type;
+                    let attribute_name = column.name.value;
+                    //let attribute_type = column.data_type;
     
-                    attributes.push(format!("{}: {}", attribute_name, attribute_type));
+                    attributes.push(format!("{:?}", attribute_name));
                 }
     
                 for constraint in constraints {
@@ -95,20 +103,28 @@ fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
                     is_joint = true;
                 }
     
-                let entity = Entity {
+                let table = Table {
                     attributes,
                     pk,
                     is_joint,
                 };
     
-                database_object.tables.insert(name.to_string(), entity);
+                database_object.tables.insert(table_name, table);
             }
             
             Statement::AlterTable { name, operations, .. } => {
+                // Obtain table name without quotes or ticks
+                let table_name = match name.0.first() {
+                    Some(ident) => ident.value.clone(),
+                    None => {
+                        panic!("Table name not specified in the SQL statement");
+                    }
+                };
+
                 for operation in operations {
                     match operation {
                         AlterTableOperation::AddConstraint(TableConstraint::Unique { columns, .. }) => {
-                            let mut table = database_object.tables.get_mut(&name.to_string()).unwrap_or_else(|| {
+                            let mut table = database_object.tables.get_mut(&table_name).unwrap_or_else(|| {
                                 panic!("Table '{}' not found in database", name);
                             });
                             for column in columns {
@@ -116,21 +132,32 @@ fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
                             }
                         }
                         AlterTableOperation::AddConstraint(TableConstraint::ForeignKey { columns, foreign_table, referred_columns, .. }) => {
-                            // Determine the relationship type
-                            let r#type = determine_relationship_type(&name.to_string(), &foreign_table.to_string(), &columns[0].to_string(), &referred_columns[0].to_string(), &database_object).unwrap();
 
-                            // Create a relationship
-                            let relationship = Relationship {
-                                table: name.to_string(),
-                                referenced_table: foreign_table.to_string(),
-                                attribute: columns[0].to_string(),
-                                referenced_attribute: referred_columns[0].to_string(),
-                                r#type,
+                            // Obtain table name without quotes or ticks
+                            let foreign_table_name = match foreign_table.0.first() {
+                                Some(ident) => ident.value.clone(),
+                                None => {
+                                    panic!("Foreign table name not specified in the SQL statement");
+                                }
                             };
 
-                            // Add the relationship to the database object
-                            let relationship_name = format!("{}VS{}", &name, &foreign_table);
-                            database_object.relationships.insert(relationship_name, relationship);
+                            for i in 0..columns.len() {
+                                // Determine the relationship type
+                                let r#type = determine_relationship_type(&table_name, &foreign_table_name, &columns[i].to_string(), &referred_columns[i].to_string(), &database_object).unwrap();
+
+                                // Create a relationship
+                                let relationship = Relationship {
+                                    table: table_name.to_string(),
+                                    referenced_table: foreign_table_name.to_string(),
+                                    attribute: columns[i].value.to_string(),
+                                    referenced_attribute: referred_columns[i].value.to_string(),
+                                    r#type,
+                                };
+
+                                // Add the relationship to the database object
+                                let relationship_name = format!("{}VS{}", table_name, foreign_table_name);
+                                database_object.relationships.insert(relationship_name, relationship);
+                            }
                         }
                         _ => {}
                     }
@@ -150,6 +177,7 @@ fn determine_relationship_type(
     referenced_attribute: &str,
     query_object: &DatabaseObject,
 ) -> Result<String, &'static str> {
+
     let table = query_object.tables.get(table_name).ok_or("Table not found")?;
     let referenced_table = query_object.tables.get(referenced_table).ok_or("Referenced table not found")?;
 

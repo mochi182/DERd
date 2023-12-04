@@ -4,3 +4,4 @@ export const globalState = writable({
     uploadedData: null,
     graph: null,
   });
+

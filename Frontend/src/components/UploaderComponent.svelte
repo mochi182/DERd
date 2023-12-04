@@ -1,16 +1,30 @@
 <script>
-    import { onMount } from "svelte";
-    import { createGraph } from "../utils/graph";
     import { globalState } from "../stores.js";
 
     let uploadedData = null;
-    let textAreaValue = "stff";
+    let textAreaValue = 'CREATE TABLE `teams` ( \
+  `team_name` varchar(50) NOT NULL, \
+  `logo` varchar(100) NOT NULL, \
+  `description` text NOT NULL \
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci; \
+ALTER TABLE `teams` \
+  ADD PRIMARY KEY (`team_name`); \
+  CREATE TABLE `players` ( \
+  `player_id` int(11) NOT NULL, \
+  `player_name` varchar(50) NOT NULL, \
+  `team` varchar(50) NOT NULL \
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci; \
+ALTER TABLE `players` \
+  ADD PRIMARY KEY (`player_id`), \
+  ADD KEY `team` (`team`); \
+  ALTER TABLE `players` \
+  ADD CONSTRAINT `players_ibfk_1` FOREIGN KEY (`team`) REFERENCES `teams` (`team_name`); \
+COMMIT;';
 
     async function handleFileUpload(event) {
         event.preventDefault();
-        console.log(textAreaValue)
 
-        const formData = new FormData();
+        //const formData = new FormData();
         //formData.append("file", file);
 
         try {
@@ -36,7 +50,7 @@
     }
 
     $: if (uploadedData) {
-        console.log(uploadedData)
+        //console.log(uploadedData)
         $globalState.uploadedData = uploadedData;
     }
 </script>
