@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
+use serde::{Serialize};
 use axum::extract::Json;
-use serde_json::{json, Value};
+use serde_json::{Value};
 use sqlparser::dialect::MySqlDialect;
 use sqlparser::parser::Parser;
-use sqlparser::ast::{Ident, TableConstraint, AlterTableOperation, Statement};
+use sqlparser::ast::{TableConstraint, AlterTableOperation, Statement};
 
 use std::collections::HashMap;
 
@@ -83,17 +83,17 @@ fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
                 };
     
                 for column in columns {
-                    let attribute_name = column.name.value;
+                    let attribute_name = column.name.value.to_string();
                     //let attribute_type = column.data_type;
     
-                    attributes.push(format!("{:?}", attribute_name));
+                    attributes.push(attribute_name);
                 }
     
                 for constraint in constraints {
                     if let TableConstraint::Unique { is_primary, columns, .. } = constraint {
                         if is_primary {
                             for column in columns {
-                                pk.push(column.to_string());
+                                pk.push(column.value.to_string());
                             }
                         }
                     }
@@ -124,11 +124,11 @@ fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
                 for operation in operations {
                     match operation {
                         AlterTableOperation::AddConstraint(TableConstraint::Unique { columns, .. }) => {
-                            let mut table = database_object.tables.get_mut(&table_name).unwrap_or_else(|| {
+                            let table = database_object.tables.get_mut(&table_name).unwrap_or_else(|| {
                                 panic!("Table '{}' not found in database", name);
                             });
                             for column in columns {
-                                table.pk.push(column.clone().to_string());
+                                table.pk.push(column.value.clone().to_string());
                             }
                         }
                         AlterTableOperation::AddConstraint(TableConstraint::ForeignKey { columns, foreign_table, referred_columns, .. }) => {
@@ -143,7 +143,13 @@ fn build_database_object(ast: Vec<Statement>) -> DatabaseObject {
 
                             for i in 0..columns.len() {
                                 // Determine the relationship type
-                                let r#type = determine_relationship_type(&table_name, &foreign_table_name, &columns[i].to_string(), &referred_columns[i].to_string(), &database_object).unwrap();
+                                let r#type = determine_relationship_type(
+                                    &table_name, 
+                                    &foreign_table_name, 
+                                    &columns[i].value.to_string(), 
+                                    &referred_columns[i].value.to_string(), 
+                                    &database_object
+                                ).unwrap();
 
                                 // Create a relationship
                                 let relationship = Relationship {
@@ -180,6 +186,9 @@ fn determine_relationship_type(
 
     let table = query_object.tables.get(table_name).ok_or("Table not found")?;
     let referenced_table = query_object.tables.get(referenced_table).ok_or("Referenced table not found")?;
+
+    println!("VERGAAA {:?} {:?} {:?} {:?}",table.pk, &attribute.to_string(), referenced_table.pk, &referenced_attribute.to_string());
+
 
     if table.pk.contains(&attribute.to_string()) && referenced_table.pk.contains(&referenced_attribute.to_string()) {
         if table.is_joint {

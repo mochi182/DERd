@@ -18,7 +18,8 @@ export function createGraph($globalState) {
         });
         
         // Add nodes for attributes
-        for (const attributeName in $globalState.uploadedData.tables[tableName].attributes) {
+        let attributeList = $globalState.uploadedData.tables[tableName].attributes;
+        attributeList.forEach ((attributeName) => {
             const attributeNode = `${attributeName} (Attribute of ${tableName})`;
             $globalState.graph.addNode(attributeNode, {
                 id: generateId(),
@@ -33,7 +34,7 @@ export function createGraph($globalState) {
             
             // Add an edge between the table node and attribute node
             $globalState.graph.addEdge(tableNode, attributeNode);
-        }
+        });
     }
     
 /*     // Iterate through relationships and add edges between related entities
