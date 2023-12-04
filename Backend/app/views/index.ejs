@@ -19,30 +19,7 @@
         
         <div id="writeQueryDiv">
             <textarea name="queryText" id="queryText" rows="4" cols="50" placeholder="Enter your SQL query here">
-                CREATE TABLE `teams` (
-                    `team_id` int(11) NOT NULL,
-                    `team_name` varchar(100) NOT NULL,
-                    `logo` varchar(100) NOT NULL,
-                    `description` text NOT NULL,
-                    `is_active` tinyint(1) NOT NULL
-                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-                  ALTER TABLE `teams`
-                    ADD PRIMARY KEY (`team_id`);
-                   CREATE TABLE `events` (
-                      `event_id` int(11) NOT NULL,
-                      `event_date` date NOT NULL,
-                      `event_time` time NOT NULL,
-                      `event_content` text NOT NULL,
-                      `teamA_id` int(11) NOT NULL,
-                      `teamA_score` int(11) DEFAULT NULL,
-                      `teamB_id` int(11) NOT NULL,
-                      `teamB_score` int(11) DEFAULT NULL,
-                      `field_id` varchar(50) NOT NULL
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-                    ALTER TABLE `events`
-                    ADD PRIMARY KEY (`event_id`);
-                  ALTER TABLE `events` ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`);
-                  ALTER TABLE `events` ADD CONSTRAINT `events_ibfk_2` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`);              
+             
             </textarea>
         </div>
         

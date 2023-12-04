@@ -1,8 +1,7 @@
 <script>
     import { onMount } from "svelte";
-  
-    export let data;
-  
+    import { globalState } from '../stores.js'
+    
     let svgContent = "";
   
     onMount(() => {
