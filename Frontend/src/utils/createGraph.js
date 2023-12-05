@@ -31,7 +31,7 @@ export function createGraph($globalState) {
                     y: Math.random() * (900 - 100) + 100,
                 },
                 neighbors: [],
-                isPK: true ? true : false
+                isPK: $globalState.uploadedData.tables[tableName].pk.includes(attributeName) ? true : false
             });
             
             // Add an edge between the table node and attribute node
@@ -69,5 +69,5 @@ export function createGraph($globalState) {
         $globalState.graph.addEdge(referencedTableNode, relationshipNode, { label: relationshipName });
     }
     
-    $globalState.graph.connectAttributesInCircle()
+    //$globalState.graph.connectAttributesInCircle()
 }
