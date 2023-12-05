@@ -1,5 +1,8 @@
 <script>
     import { globalState } from "../stores.js";
+    import BasketComponent from "./BasketComponent.svelte"
+
+    $: containerWidth = "200px";
 
     let uploadedData = null;
     let textAreaValue = 'CREATE TABLE `teams` ( \
@@ -56,47 +59,36 @@ COMMIT;';
 </script>
 
 <div>
-    <form id="queryForm">
-        <label>
-            <input
-                type="radio"
-                name="queryType"
-                value="write"
-                id="writeQuery"
-                checked
-            />
-            Write query
-        </label>
-        <label>
-            <input
-                type="radio"
-                name="queryType"
-                value="upload"
-                id="uploadQuery"
-            /> Upload SQL file
-        </label>
 
-        <div id="writeQueryDiv">
+    <div class="inputContainer" style="width: {containerWidth}">
+
             <textarea
                 bind:value={textAreaValue}
                 name="queryText"
                 id="queryText"
-                rows="4"
-                cols="50"
                 placeholder="Enter your SQL query here"
             ></textarea>
-        </div>
+    </div>
 
-        <div id="uploadQueryDiv">
-            <label for="SQLfile">Upload SQL file:</label>
-            <input type="file" name="SQLfile" id="SQLfile" accept=".sql" />
-        </div>
+    <BasketComponent />
 
-        <input
-            on:click={handleFileUpload}
-            type="submit"
-            value="Submit"
-            class="btn btn-success"
-        />
-    </form>
+    <button
+    on:click={handleFileUpload}
+    class="btn btn-success"
+    />
+
 </div>
+
+<style>
+    .inputContainer {
+        display:flex;
+        align-content: center;
+        align-items: center;
+        justify-content: middle;
+        width: var(--containerWidth);
+    }
+
+    textArea {
+        width: 100%;
+    }
+</style>
