@@ -1,21 +1,21 @@
 <script>
+    import { basketSize } from "../stores";
+    
     let svgElement;
     let pathElement;
 
-    $: basketHeight = 200;
-    $: basketWidth = 300;
     $: outerOffset = 40;
     $: innerOffset = 50;
-    $: svgWidth = basketWidth + (2 * outerOffset) + (2 * innerOffset);
-    $: svgHeight = basketHeight + 30;
-    $: basketOriginY = (svgHeight / 2) - (basketHeight / 2);
-    $: basketOriginX = (svgWidth / 2) - (basketWidth / 2) - innerOffset;
+    $: svgWidth = $basketSize.width + (2 * outerOffset) + (2 * innerOffset);
+    $: svgHeight = $basketSize.height + 30;
+    $: basketOriginY = (svgHeight / 2) - ($basketSize.height / 2);
+    $: basketOriginX = (svgWidth / 2) - ($basketSize.width / 2) - innerOffset;
 
     $: basketPath = `
     M ${basketOriginX} ${basketOriginY} 
-    C ${basketOriginX} ${basketOriginY} ${basketOriginX - outerOffset} ${basketOriginY + basketHeight} ${basketOriginX + innerOffset} ${basketOriginY + basketHeight}
-    L ${basketOriginX + innerOffset + basketWidth} ${basketOriginY + basketHeight}
-    C ${basketOriginX + basketWidth + outerOffset + (2*innerOffset)} ${basketOriginY + basketHeight} ${basketOriginX + basketWidth + (2*innerOffset)} ${basketOriginY} ${basketOriginX + basketWidth + (2*innerOffset)} ${basketOriginY}
+    C ${basketOriginX} ${basketOriginY} ${basketOriginX - outerOffset} ${basketOriginY + $basketSize.height} ${basketOriginX + innerOffset} ${basketOriginY + $basketSize.height}
+    L ${basketOriginX + innerOffset + $basketSize.width} ${basketOriginY + $basketSize.height}
+    C ${basketOriginX + $basketSize.width + outerOffset + (2*innerOffset)} ${basketOriginY + $basketSize.height} ${basketOriginX + $basketSize.width + (2*innerOffset)} ${basketOriginY} ${basketOriginX + $basketSize.width + (2*innerOffset)} ${basketOriginY}
     `
     import { onMount } from 'svelte';
 
@@ -49,14 +49,14 @@
             
             // Resize logic based on the quadrant
             if (isLeftQuadrant) {
-                basketWidth += -deltaX
+                $basketSize.width += -deltaX
             } else if (isRightQuadrant) {
-                basketWidth += deltaX
+                $basketSize.width += deltaX
             } 
             if (isTopQuadrant) {
-                basketHeight += -deltaY
+                $basketSize.height += -deltaY
             } else if (isBottomQuadrant) {
-                basketHeight += deltaY
+                $basketSize.height += deltaY
             }
 
             // Update initial mouse position for the next move
@@ -85,6 +85,7 @@
     class={mouseOverClass}
     d={basketPath}
     bind:this={pathElement}
+    stroke-linecap="round" 
     ></path>
 </svg>
 </div>
@@ -93,7 +94,7 @@
 
     path {
         fill: none;
-        stroke: blue;
+        stroke: rgb(40, 85, 182);
         paint-order: fill;
         stroke-width: 30px;
     }
@@ -111,18 +112,7 @@
         cursor: grabbing;
     }
     
-    .overLeftBorder {
-        border-left: 1px solid black;
-        stroke-width: 3;
-    }
-    
-    .overRightBorder {
-        border-right: 1px solid black;
-        stroke-width: 3;
-    }
-    
-    .overBottomBorder {
-        border-bottom: 1px solid black;
-        stroke-width: 3;
+    path:hover {
+        filter: drop-shadow( 0 0 10px #719ECE);
     }
 </style>

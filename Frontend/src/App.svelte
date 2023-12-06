@@ -21,7 +21,9 @@
 
 <div>
     <UploaderComponent />
-    <ImageComponent {imageSrc} />
+    {#if $globalState.uploadedData} 
+        <ImageComponent {imageSrc} />
+    {/if}
 </div>
 
 <style>

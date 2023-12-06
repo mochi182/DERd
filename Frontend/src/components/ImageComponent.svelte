@@ -7,7 +7,7 @@
     onMount(() => {
       const imgElement = document.getElementById("ErDiagram");
       imgElement.addEventListener("click", () => {
-        DiagramEditor.editElement(imgElement, null, "sketch", null, ["dark=1", "pv=0"]);
+        DiagramEditor.editElement(imgElement, null, "sketch", null, ["dark=0", "pv=0"]);
       });
     });
   </script>
@@ -19,7 +19,10 @@
 <style>
     #ErDiagram {
         cursor: pointer;
-        border: 1px solid black;
+        border: 1px solid #719ECE;
+        box-shadow: 0 0 10px #719ece4d;
+        border-radius: 2em;
+        margin: 2rem;
     }
 
 </style>

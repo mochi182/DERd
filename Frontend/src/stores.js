@@ -6,5 +6,9 @@ export const globalState = writable({
     redrawStack: {}, // Create an empty stack to store the elements that need to be redrawn
     drawingWidth: 827,
     drawingHeight: 1169
-  });
+});
 
+export const basketSize = writable({
+    width: 300,
+    height: 200
+})

@@ -187,9 +187,6 @@ fn determine_relationship_type(
     let table = query_object.tables.get(table_name).ok_or("Table not found")?;
     let referenced_table = query_object.tables.get(referenced_table).ok_or("Referenced table not found")?;
 
-    println!("VERGAAA {:?} {:?} {:?} {:?}",table.pk, &attribute.to_string(), referenced_table.pk, &referenced_attribute.to_string());
-
-
     if table.pk.contains(&attribute.to_string()) && referenced_table.pk.contains(&referenced_attribute.to_string()) {
         if table.is_joint {
             Ok("M:N".to_string())

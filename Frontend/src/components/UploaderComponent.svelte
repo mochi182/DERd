@@ -1,8 +1,6 @@
 <script>
-    import { globalState } from "../stores.js";
+    import { globalState, basketSize } from "../stores.js";
     import BasketComponent from "./BasketComponent.svelte"
-
-    $: containerWidth = "200px";
 
     let uploadedData = null;
     let textAreaValue = 'CREATE TABLE `teams` ( \
@@ -56,17 +54,21 @@ COMMIT;';
         //console.log(uploadedData)
         $globalState.uploadedData = uploadedData;
     }
+
 </script>
 
 <div>
 
-    <div class="inputContainer" style="width: {containerWidth}">
-
+    <div class="inputContainer" style="width: calc({$basketSize.width}px + 80px)">
             <textarea
                 bind:value={textAreaValue}
                 name="queryText"
                 id="queryText"
                 placeholder="Enter your SQL query here"
+                style="
+                width: calc({$basketSize.width}px + 30px);
+                height: calc({$basketSize.height}px - 40px);
+                "
             ></textarea>
     </div>
 
@@ -75,20 +77,62 @@ COMMIT;';
     <button
     on:click={handleFileUpload}
     class="btn btn-success"
-    />
+    >Draw ER <span>diagram</span></button>
 
 </div>
 
 <style>
     .inputContainer {
-        display:flex;
-        align-content: center;
-        align-items: center;
-        justify-content: middle;
-        width: var(--containerWidth);
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
     }
 
     textArea {
-        width: 100%;
+        position: absolute;
+        top: 30px;
+        left: 24px;
+        resize: none;
+        border: none;
+    }
+
+    textArea:focus {
+        outline: none !important;
+    }
+
+    textarea {
+    scrollbar-width: thin;
+    scrollbar-color: #c4d5e7 #FFFFFF; /* Track color and thumb color */
+    }
+
+    /* For Webkit browsers (Chrome, Safari) */
+    textarea::-webkit-scrollbar {
+    width: 8px; /* Adjust the width as needed */
+    }
+
+    textarea::-webkit-scrollbar-track {
+    background-color: #FFFFFF; /* Track color */
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+    background-color: #c4d5e7; /* Thumb color */
+    border-radius: 8px; /* Rounded corners */
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+    background-color: #abc4df; /* Thumb color on hover */
+    }
+
+    button {
+        color:white;
+        background-color: rgb(40, 85, 182);
+    }
+
+    button:hover {
+        box-shadow: 0 0 10px #719ECE;
+    }
+
+    button:focus {
+        outline: none !important;
     }
 </style>
