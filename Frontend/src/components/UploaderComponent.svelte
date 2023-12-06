@@ -88,7 +88,7 @@ COMMIT;';
         position: relative;
     }
 
-    textArea {
+    #queryText {
         position: absolute;
         top: 30px;
         left: 24px;
@@ -96,30 +96,30 @@ COMMIT;';
         border: none;
     }
 
-    textArea:focus {
+    #queryText:focus {
         outline: none !important;
     }
 
-    textarea {
+    #queryText {
     scrollbar-width: thin;
     scrollbar-color: #c4d5e7 #FFFFFF; /* Track color and thumb color */
     }
 
     /* For Webkit browsers (Chrome, Safari) */
-    textarea::-webkit-scrollbar {
+    #queryText::-webkit-scrollbar {
     width: 8px; /* Adjust the width as needed */
     }
 
-    textarea::-webkit-scrollbar-track {
+    #queryText::-webkit-scrollbar-track {
     background-color: #FFFFFF; /* Track color */
     }
 
-    textarea::-webkit-scrollbar-thumb {
+    #queryText::-webkit-scrollbar-thumb {
     background-color: #c4d5e7; /* Thumb color */
     border-radius: 8px; /* Rounded corners */
     }
 
-    textarea::-webkit-scrollbar-thumb:hover {
+    #queryText::-webkit-scrollbar-thumb:hover {
     background-color: #abc4df; /* Thumb color on hover */
     }
 
