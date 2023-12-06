@@ -85,7 +85,7 @@
     class={mouseOverClass}
     d={basketPath}
     bind:this={pathElement}
-    stroke-linecap="round" 
+    stroke-linecap="butt" 
     ></path>
 </svg>
 </div>

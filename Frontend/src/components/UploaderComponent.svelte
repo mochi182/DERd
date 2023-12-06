@@ -1,6 +1,8 @@
 <script>
     import { globalState, basketSize } from "../stores.js";
     import BasketComponent from "./BasketComponent.svelte"
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
 
     let uploadedData = null;
     let textAreaValue = 'CREATE TABLE `teams` ( \
@@ -55,11 +57,24 @@ COMMIT;';
         $globalState.uploadedData = uploadedData;
     }
 
+	const movement = tweened(0, {
+		duration: 100,
+		easing: cubicOut
+	});
+
+    async function setMove(v) {
+        await movement.set(v)
+        await movement.set(-v)
+        movement.set(0)
+    }
+
+    // https://stackoverflow.com/questions/75601130/is-it-possible-to-get-the-state-of-a-svelte-tweened-motion
+
 </script>
 
 <div>
 
-    <div class="inputContainer" style="width: calc({$basketSize.width}px + 80px)">
+    <div class="inputContainer" style="width: calc({$basketSize.width}px + 80px); transform: rotate({$movement}deg);">
             <textarea
                 bind:value={textAreaValue}
                 name="queryText"
@@ -69,6 +84,7 @@ COMMIT;';
                 width: calc({$basketSize.width}px + 30px);
                 height: calc({$basketSize.height}px - 40px);
                 "
+                on:input={() => setMove(10)}
             ></textarea>
     </div>
 
@@ -134,5 +150,10 @@ COMMIT;';
 
     button:focus {
         outline: none !important;
+    }
+
+    .inputContainer,
+    BasketComponent {
+        transition: transform 300ms ease-in-out;
     }
 </style>
