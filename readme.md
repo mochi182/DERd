@@ -1,4 +1,4 @@
-# 🟪 DERd - Draw Entity Relationship diagrams
+# 🧺 DERd - Draw Entity Relationship diagrams
 
 DERd is a web application that parses SQL queries and uses a force-directed drawing algorithm to generate Entity Relationship (ER) diagrams, following Chen notation.
 
