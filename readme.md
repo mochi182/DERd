@@ -11,7 +11,7 @@ DERd is a web application that parses SQL queries and uses a force-directed draw
 ## Sample Image 📷
 
 <p align="center">
-  <img src="./readme_pics/sample1.JPG" alt="Sample Image">
+  <img src="./readme_pics/sample2.png" alt="Sample Image">
 </p>
 
 ## Features 🛠️
