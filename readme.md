@@ -1,6 +1,6 @@
-# DERbP - Draw Entity Relationship bluePrints ✎🖇️
+# DERd - Draw Entity Relationship diagrams ✎🖇️
 
-DERbP is a web application that parses SQL queries and uses a force-directed drawing algorithm to generate Entity Relationship (ER) diagrams, following Chen notation.
+DERd is a web application that parses SQL queries and uses a force-directed drawing algorithm to generate Entity Relationship (ER) diagrams, following Chen notation.
 
 ## Technologies Used 🚀
 
